@@ -53,15 +53,20 @@ namespace version_control_tool
         private static void PushAllChannelsIntoMirth(Request request, string baseUrl, string id)
         {
             XmlDocument document = new XmlDocument();
-            var files = Directory.EnumerateFiles("../../../remote/Channels", "*.xml").ToArray();
-
-            for (var i = 0; i < files.Length; i++)
+            var rootFiles = Directory.EnumerateFiles("../../../remote/Channels", "*.xml").ToArray();
+            var subDirectories = Directory.GetDirectories("../../../remote/Channels");
+            foreach(var sub in subDirectories)
             {
-                document.Load(files[i]);
+                var inFolderFiles = Directory.EnumerateFiles($"{sub}", "*.xml").ToArray();
+                rootFiles = rootFiles.Union(inFolderFiles).ToArray();
+            }
+            for (var i = 0; i < rootFiles.Length; i++)
+            {
+                document.Load(rootFiles[i]);
                 var idNode = document.GetElementsByTagName("id");
                 var channelId = idNode[0].InnerText;
                 
-                var fileName = Path.GetFileName(files[i]);
+                var fileName = Path.GetFileName(rootFiles[i]);
 
                 if (string.IsNullOrEmpty(id))
                 {
