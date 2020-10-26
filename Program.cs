@@ -16,8 +16,7 @@ namespace version_control_tool
             string baseUrl = "";
             string operation = "";
             string id = "";
-            string fileName = "";
-
+            
             if (args.Length == 0)
                 Console.WriteLine("Empty arguments");
 
@@ -37,106 +36,166 @@ namespace version_control_tool
                     case "-id":
                         id = args[i + 1];
                         break;
-                    case "-channel":
-                        fileName = args[i + 1];
-                        break;
                 }
             }
             operation = args.Last();
 
             Request request = new Request();
             string encodedLogin = $"username={username}&password={password}";
-            request.CreateRequest("POST", baseUrl + URL.Login, encodedLogin, false);
+            request.CreateRequest("POST", baseUrl + URL.Login, encodedLogin);
 
             if (operation == "pull")
                 PullDataFromMirth(request, baseUrl);
             else if (operation == "push")
-                PushAllChannelsIntoMirth(request, baseUrl, id, fileName);
+                PushAllChannelsIntoMirth(request, baseUrl, id);
         }
 
-        private static void PushAllChannelsIntoMirth(Request request, string baseUrl, string id, string name)
+        private static void PushAllChannelsIntoMirth(Request request, string baseUrl, string id)
         {
             XmlDocument document = new XmlDocument();
-
             var files = Directory.EnumerateFiles("../../../remote/Channels", "*.xml").ToArray();
-            
+
             for (var i = 0; i < files.Length; i++)
             {
                 document.Load(files[i]);
                 var idNode = document.GetElementsByTagName("id");
                 var channelId = idNode[0].InnerText;
                 
-                var fileName = files[i];
+                var fileName = Path.GetFileName(files[i]);
 
-                if (String.IsNullOrEmpty(id) && String.IsNullOrEmpty(name))
-                    request.CreateRequest("PUT", baseUrl + URL.Channels + $"/{channelId}?override=true", document.InnerXml, false);
+                if (string.IsNullOrEmpty(id))
+                {
+                    Console.WriteLine($"Pushing {fileName} into {baseUrl}...");
+                    request.CreateRequest("PUT", baseUrl + URL.Channels + $"/{channelId}?override=true", document.InnerXml);
+                }
                 else if (id == channelId)
-                    request.CreateRequest("PUT", baseUrl + URL.Channels + $"/{channelId}?override=true", document.InnerXml, false);
-                else if (fileName.Contains(name))
-                    request.CreateRequest("POST", baseUrl + URL.Channels, document.InnerXml, true);
-
+                {
+                    Console.WriteLine($"Pushing {fileName} id {id} into {baseUrl}...");
+                    request.CreateRequest("PUT", baseUrl + URL.Channels + $"/{channelId}?override=true", document.InnerXml);
+                }
             }
         }
 
         private static void PullDataFromMirth(Request request, string baseUrl)
         {
             Console.WriteLine($"Pulling data from: {baseUrl}...");
-            var groups = request.CreateRequest("GET", baseUrl + URL.ChannelGroups, null, false);
+            var groups = request.CreateRequest("GET", baseUrl + URL.ChannelGroups, null);
             var groupsXml = new StreamReader(groups.GetResponseStream()).ReadToEnd();
 
-            var channels = request.CreateRequest("GET", baseUrl + URL.Channels, null, false);
+            var channels = request.CreateRequest("GET", baseUrl + URL.Channels, null);
             var channelsXml = new StreamReader(channels.GetResponseStream()).ReadToEnd();
 
-            var codeTemplates = request.CreateRequest("GET", baseUrl + URL.CodeTemplates, null, false);
+            var codeTemplatesLibrary = request.CreateRequest("GET", baseUrl + URL.CodeTemplatesLibrary + "?includeCodeTemplates=true", null);
+            var codeTemplatesLibraryXml = new StreamReader(codeTemplatesLibrary.GetResponseStream()).ReadToEnd();
+
+            var codeTemplates = request.CreateRequest("GET", baseUrl + URL.CodeTemplates, null);
             var codeTemplatesXml = new StreamReader(codeTemplates.GetResponseStream()).ReadToEnd();
 
-         
-            WriteChannels(channelsXml);
+            WriteCodeTemplatesLibraries(codeTemplatesLibraryXml);
+            WriteCodeTemplates(codeTemplatesXml);
+            WriteChannels(channelsXml, groupsXml);
         }
 
-        //write code templates
-        static void WriteFileToDirectory(string xml)
+        static void WriteCodeTemplatesLibraries(string codeTemplateXml)
         {
-            string fileName = "index";
-            string directoryName = "";
-            XmlDocument document = new XmlDocument();
-            document.LoadXml(xml);
-
-            XmlNodeList xmlNodeList = document.GetElementsByTagName("name");
-
-            for (int i = 0; i < xmlNodeList.Count; i++)
-            {
-                directoryName = xmlNodeList[i].InnerXml;
-            }
-
+            var directoryName = "Libraries";
             Directory.CreateDirectory($"../../../remote/{directoryName}");
-            document.Save($"../../../remote/{directoryName}/{fileName}.xml");
-        }
 
-        static void WriteChannels(string xml)
-        {
-            string directoryName = "Channels";
-            Directory.CreateDirectory($"../../../remote/{directoryName}");
-            
-            XmlDocument document = new XmlDocument();
-
-            var xDoc = XDocument.Parse(xml); // loading source xml
-            var xmls = xDoc.Root.Elements().ToArray(); // split into elements
+            XmlDocument codeTemplateLibraryDocument = new XmlDocument();
+            var xDocCodeTemplateLibrary = XDocument.Parse(codeTemplateXml);
+            var xmlsCodeTemplateLibrary = xDocCodeTemplateLibrary.Root.Elements().ToArray();
 
             Console.WriteLine($"Saving data on /remote/{directoryName}...");
-
-            for (int i = 0; i < xmls.Length; i++)
+            for (int i = 0; i < xmlsCodeTemplateLibrary.Length; i++)
             {
-                
-                document.LoadXml(xmls[i].ToString());
-
-                var name = document.GetElementsByTagName("name");
-
-                document.Save($"../../../remote/{directoryName}/{name[0].InnerText}.xml");
+                codeTemplateLibraryDocument.LoadXml(xmlsCodeTemplateLibrary[i].ToString());
+                var name = codeTemplateLibraryDocument.GetElementsByTagName("name")[0].InnerText;
+                codeTemplateLibraryDocument.Save($"../../../remote/{directoryName}/{name}.xml");
             }
-            Console.WriteLine($"Finished");
+        }
 
+        static void WriteCodeTemplates(string codeTemplateXml)
+        {
+            XmlDocument codeTemplateDocument = new XmlDocument();
+            var xDocCodeTemplate = XDocument.Parse(codeTemplateXml);
+            var xmlsCodeTemplate = xDocCodeTemplate.Root.Elements().ToArray();
+           
+            for (int i = 0; i < xmlsCodeTemplate.Length; i++)
+            {
+                codeTemplateDocument.LoadXml(xmlsCodeTemplate[i].ToString());
+                var name = codeTemplateDocument.GetElementsByTagName("name")[0].InnerText;
+                Console.WriteLine($"Saving data on /remote/Libraries/{name}...");
+
+                Directory.CreateDirectory($"../../../remote/Libraries/{name}");
+                codeTemplateDocument.Save($"../../../remote/Libraries/{name}/{name}.xml");
+            }
+        }
+        static void WriteChannels(string channelsXml, string groupsXml)
+        {
+            var groupChannelsWrapper = new List<Wrapper>();
+            var directoryName = "Channels";
+            Directory.CreateDirectory($"../../../remote/{directoryName}");
+
+            XmlDocument channelsDocument = new XmlDocument();
+            XmlDocument groupsDocument = new XmlDocument();
+            var xDocChannels = XDocument.Parse(channelsXml);
+            var xmlsChannels = xDocChannels.Root.Elements().ToArray();
+            var xDocGroups = XDocument.Parse(groupsXml); 
+            var xmlsGroups = xDocGroups.Root.Elements().ToArray();
+            
+            Console.WriteLine($"Saving data on /remote/{directoryName}...");
+            for (int i = 0; i < xmlsGroups.Length; i++)
+            {
+                groupsDocument.LoadXml(xmlsGroups[i].ToString());
+                var folderName = groupsDocument.GetElementsByTagName("name")[0].InnerText;
+                Directory.CreateDirectory($"../../../remote/{directoryName}/{folderName}");
+                foreach (XmlNode node in groupsDocument.GetElementsByTagName("id"))
+                {
+                    groupChannelsWrapper.Add(new Wrapper(folderName, node.InnerText));
+                }
+            }
+
+            for (int j = 0; j < xmlsChannels.Length; j++)
+            {
+                channelsDocument.LoadXml(xmlsChannels[j].ToString());
+                var name = channelsDocument.GetElementsByTagName("name")[0].InnerText;
+                channelsDocument.Save($"../../../remote/{directoryName}/{name}.xml");
+            }
+
+            OrganizeChannels(groupChannelsWrapper);
+            Console.WriteLine($"Finished");
+        }
+        static void OrganizeChannels(List<Wrapper> wrappers)
+        {
+            Console.WriteLine($"Organizing channels...");
+            XmlDocument document = new XmlDocument();
+            var files = Directory.EnumerateFiles("../../../remote/Channels", "*.xml").ToArray();
+
+            for (var i = 0; i < files.Length; i++)
+            {
+                var fileName = Path.GetFileName(files[i]);
+                document.Load(files[i]);
+                var channelId = document.GetElementsByTagName("id")[0].InnerText;
+                foreach (var wrapper in wrappers)
+                {
+                    if(wrapper.id == channelId)
+                    {
+                        if(!File.Exists($"../../../remote/Channels/{wrapper.groupName}/{fileName}"))
+                            File.Move(files[i], $"../../../remote/Channels/{wrapper.groupName}/{fileName}");
+                    }
+                }
+            }
         }
     }
 
+    sealed class Wrapper
+    {
+        public Wrapper(string groupName, string id)
+        {
+            this.groupName = groupName;
+            this.id = id;
+        }
+        public string groupName { get; } 
+        public string id { get; }
+    }
 }

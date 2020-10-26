@@ -10,7 +10,7 @@ namespace version_control_tool
     public class Request
     {
         CookieContainer cookieContainer = new CookieContainer();
-        public HttpWebResponse CreateRequest(string requestType, string url, string encodedBody, bool addChannel)
+        public HttpWebResponse CreateRequest(string requestType, string url, string encodedBody)
         {
 
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
@@ -26,21 +26,10 @@ namespace version_control_tool
                 return (true);
             };
 
-            if (requestType == "POST" && !addChannel)
+            if (requestType == "POST")
             {
                 byte[] data = Encoding.ASCII.GetBytes(encodedBody);
                 request.ContentType = "application/x-www-form-urlencoded";
-                request.ContentLength = data.Length;
-
-                Stream requestStream = request.GetRequestStream();
-                requestStream.Write(data, 0, data.Length);
-                requestStream.Close();
-            }
-
-            if (requestType == "POST" && addChannel)
-            {
-                byte[] data = Encoding.ASCII.GetBytes(encodedBody);
-                request.ContentType = "application/xml";
                 request.ContentLength = data.Length;
 
                 Stream requestStream = request.GetRequestStream();
