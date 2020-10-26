@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -11,7 +10,7 @@ namespace version_control_tool
     public class Request
     {
         CookieContainer cookieContainer = new CookieContainer();
-        public HttpWebResponse CreateRequest(string requestType, string url, string encodedBody)
+        public HttpWebResponse CreateRequest(string requestType, string url, string encodedBody, bool addChannel)
         {
 
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
@@ -27,10 +26,32 @@ namespace version_control_tool
                 return (true);
             };
 
-            if (requestType == "POST")
+            if (requestType == "POST" && !addChannel)
             {
                 byte[] data = Encoding.ASCII.GetBytes(encodedBody);
                 request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = data.Length;
+
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(data, 0, data.Length);
+                requestStream.Close();
+            }
+
+            if (requestType == "POST" && addChannel)
+            {
+                byte[] data = Encoding.ASCII.GetBytes(encodedBody);
+                request.ContentType = "application/xml";
+                request.ContentLength = data.Length;
+
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(data, 0, data.Length);
+                requestStream.Close();
+            }
+
+            if (requestType == "PUT")
+            {
+                byte[] data = Encoding.ASCII.GetBytes(encodedBody);
+                request.ContentType = "application/xml";
                 request.ContentLength = data.Length;
 
                 Stream requestStream = request.GetRequestStream();
