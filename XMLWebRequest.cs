@@ -7,26 +7,26 @@ using System.Text;
 
 namespace version_control_tool
 {
-    public class Request
+    public class XMLWebRequest
     {
         CookieContainer cookieContainer = new CookieContainer();
-        public HttpWebResponse CreateRequest(string requestType, string url, string encodedBody)
+        public HttpWebResponse CreateRequest(RequestType requestType, string url, string encodedBody)
         {
 
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = requestType;
             request.AllowAutoRedirect = false;
             request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
             request.CookieContainer = cookieContainer;
 
             ServicePointManager.ServerCertificateValidationCallback = delegate (
-            Object obj, X509Certificate certificate, X509Chain chain,
+            object obj, X509Certificate certificate, X509Chain chain,
              SslPolicyErrors errors)
             {
                 return (true);
             };
 
-            if (requestType == "POST")
+            if (requestType == RequestType.POST)
             {
                 byte[] data = Encoding.ASCII.GetBytes(encodedBody);
                 request.ContentType = "application/x-www-form-urlencoded";

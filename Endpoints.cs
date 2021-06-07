@@ -1,6 +1,6 @@
 ﻿namespace version_control_tool
 {
-    public static class URL
+    public static class Endpoints
     {
         public const string Login = "/users/_login";
         public const string Channels = "/channels";

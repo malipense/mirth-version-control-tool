@@ -13,7 +13,7 @@ namespace version_control_tool
         {
             string username = "";
             string password = "";
-            string baseUrl = "";
+            string baseURl = "";
             string operation = "";
             string id = "";
             
@@ -25,7 +25,7 @@ namespace version_control_tool
                 switch (args[i])
                 {
                     case "-server":
-                        baseUrl = args[i + 1];
+                        baseURl = args[i + 1];
                         break;
                     case "-username":
                         username = args[i + 1];
@@ -40,17 +40,23 @@ namespace version_control_tool
             }
             operation = args.Last();
 
-            Request request = new Request();
-            string encodedLogin = $"username={username}&password={password}";
-            request.CreateRequest("POST", baseUrl + URL.Login, encodedLogin);
-
+            var Connection = Login(username, password, baseURl);
+            
             if (operation == "pull")
-                PullDataFromMirth(request, baseUrl);
+                PullDataFromMirth(Connection, baseURl);
             else if (operation == "push")
-                PushAllChannelsIntoMirth(request, baseUrl, id);
+                PushAllChannelsIntoMirth(Connection, baseURl, id);
         }
 
-        private static void PushAllChannelsIntoMirth(Request request, string baseUrl, string id)
+        private static XMLWebRequest Login(string username, string password, string baseURL)
+        {
+            XMLWebRequest request = new XMLWebRequest();
+            string encodedLogin = $"username={username}&password={password}";
+            request.CreateRequest(RequestType.POST, baseURL + Endpoints.Login, encodedLogin);
+
+            return request;
+        }
+        private static void PushAllChannelsIntoMirth(XMLWebRequest request, string baseUrl, string id)
         {
             XmlDocument document = new XmlDocument();
             var rootFiles = Directory.EnumerateFiles("../../../remote/Channels", "*.xml").ToArray();
@@ -71,29 +77,29 @@ namespace version_control_tool
                 if (string.IsNullOrEmpty(id))
                 {
                     Console.WriteLine($"Pushing {fileName} into {baseUrl}...");
-                    request.CreateRequest("PUT", baseUrl + URL.Channels + $"/{channelId}?override=true", document.InnerXml);
+                    request.CreateRequest("PUT", baseUrl + Endpoints.Channels + $"/{channelId}?override=true", document.InnerXml);
                 }
                 else if (id == channelId)
                 {
                     Console.WriteLine($"Pushing {fileName} id {id} into {baseUrl}...");
-                    request.CreateRequest("PUT", baseUrl + URL.Channels + $"/{channelId}?override=true", document.InnerXml);
+                    request.CreateRequest("PUT", baseUrl + Endpoints.Channels + $"/{channelId}?override=true", document.InnerXml);
                 }
             }
         }
 
-        private static void PullDataFromMirth(Request request, string baseUrl)
+        private static void PullDataFromMirth(XMLWebRequest request, string baseUrl)
         {
             Console.WriteLine($"Pulling data from: {baseUrl}...");
-            var groups = request.CreateRequest("GET", baseUrl + URL.ChannelGroups, null);
+            var groups = request.CreateRequest("GET", baseUrl + Endpoints.ChannelGroups, null);
             var groupsXml = new StreamReader(groups.GetResponseStream()).ReadToEnd();
 
-            var channels = request.CreateRequest("GET", baseUrl + URL.Channels, null);
+            var channels = request.CreateRequest("GET", baseUrl + Endpoints.Channels, null);
             var channelsXml = new StreamReader(channels.GetResponseStream()).ReadToEnd();
 
-            var codeTemplatesLibrary = request.CreateRequest("GET", baseUrl + URL.CodeTemplatesLibrary + "?includeCodeTemplates=true", null);
+            var codeTemplatesLibrary = request.CreateRequest("GET", baseUrl + Endpoints.CodeTemplatesLibrary + "?includeCodeTemplates=true", null);
             var codeTemplatesLibraryXml = new StreamReader(codeTemplatesLibrary.GetResponseStream()).ReadToEnd();
 
-            var codeTemplates = request.CreateRequest("GET", baseUrl + URL.CodeTemplates, null);
+            var codeTemplates = request.CreateRequest("GET", baseUrl + Endpoints.CodeTemplates, null);
             var codeTemplatesXml = new StreamReader(codeTemplates.GetResponseStream()).ReadToEnd();
 
             WriteCodeTemplatesLibraries(codeTemplatesLibraryXml);
