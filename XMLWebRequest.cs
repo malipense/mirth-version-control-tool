@@ -9,8 +9,15 @@ namespace version_control_tool
 {
     public class XMLWebRequest
     {
-        CookieContainer cookieContainer = new CookieContainer();
-        public HttpWebResponse CreateRequest(RequestType requestType, string url, string encodedBody)
+        private string URL { get; set; }
+        private CookieContainer cookieContainer = new CookieContainer();
+        public XMLWebRequest(string URL)
+        {
+            this.URL = URL;
+        }
+
+
+        public HttpWebRequest CreateRequest(string requestType, string url)
         {
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
@@ -26,17 +33,32 @@ namespace version_control_tool
                 return (true);
             };
 
-            if (requestType == RequestType.POST)
-            {
-                byte[] data = Encoding.ASCII.GetBytes(encodedBody);
-                request.ContentType = "application/x-www-form-urlencoded";
-                request.ContentLength = data.Length;
+            return request;
+        }
 
-                Stream requestStream = request.GetRequestStream();
-                requestStream.Write(data, 0, data.Length);
-                requestStream.Close();
-            }
+        
+        public void Authenticate(string username, string password)
+        {
+            string encodedLogin = $"username={username}&password={password}";
+            UpdateCookies(Post(encodedLogin));
+        }
 
+        public HttpWebResponse Post(string encodedContent)
+        {
+            var request = CreateRequest("POST", URL + Endpoints.Login);
+            byte[] data = Encoding.ASCII.GetBytes(encodedContent);
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = data.Length;
+
+            Stream requestStream = request.GetRequestStream();
+            requestStream.Write(data, 0, data.Length);
+            requestStream.Close();
+            return (HttpWebResponse)request.GetResponse();
+        }
+
+        public HttpWebResponse Put()
+        {
+            /*
             if (requestType == "PUT")
             {
                 byte[] data = Encoding.ASCII.GetBytes(encodedBody);
@@ -47,10 +69,13 @@ namespace version_control_tool
                 requestStream.Write(data, 0, data.Length);
                 requestStream.Close();
             }
+            */
+            throw new NotImplementedException;
+        }
 
-            var response = (HttpWebResponse)request.GetResponse();
-
-            if(cookieContainer.Count == 0)
+        private void UpdateCookies(HttpWebResponse response)
+        {
+            if (cookieContainer.Count == 0)
             {
                 using (var streamReader = new StreamReader(response.GetResponseStream()))
                 {
@@ -60,8 +85,7 @@ namespace version_control_tool
                     }
                 }
             }
-            
-            return response;
         }
+
     }
 }

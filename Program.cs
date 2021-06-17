@@ -13,7 +13,7 @@ namespace version_control_tool
         {
             string username = "";
             string password = "";
-            string baseURl = "";
+            string baseURL = "";
             string operation = "";
             string id = "";
             
@@ -25,7 +25,7 @@ namespace version_control_tool
                 switch (args[i])
                 {
                     case "-server":
-                        baseURl = args[i + 1];
+                        baseURL = args[i + 1];
                         break;
                     case "-username":
                         username = args[i + 1];
@@ -40,7 +40,8 @@ namespace version_control_tool
             }
             operation = args.Last();
 
-            var Connection = Login(username, password, baseURl);
+            var xmlRequest = new XMLWebRequest(baseURL);
+            xmlRequest.Authenticate(username, password);
             
             if (operation == "pull")
                 PullDataFromMirth(Connection, baseURl);
@@ -48,14 +49,7 @@ namespace version_control_tool
                 PushAllChannelsIntoMirth(Connection, baseURl, id);
         }
 
-        private static XMLWebRequest Login(string username, string password, string baseURL)
-        {
-            XMLWebRequest request = new XMLWebRequest();
-            string encodedLogin = $"username={username}&password={password}";
-            request.CreateRequest(RequestType.POST, baseURL + Endpoints.Login, encodedLogin);
-
-            return request;
-        }
+      
         private static void PushAllChannelsIntoMirth(XMLWebRequest request, string baseUrl, string id)
         {
             XmlDocument document = new XmlDocument();
