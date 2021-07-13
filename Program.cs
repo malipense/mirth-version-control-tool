@@ -9,14 +9,16 @@ namespace version_control_tool
 {
     class Program
     {
-        static void Main(string[] args)
+        static async System.Threading.Tasks.Task Main(string[] args)
         {
+            HelloUser();
+
             string username = "";
             string password = "";
             string baseURL = "";
             string operation = "";
             string id = "";
-            
+            /*
             if (args.Length == 0)
                 Console.WriteLine("Empty arguments");
 
@@ -39,7 +41,13 @@ namespace version_control_tool
                 }
             }
             operation = args.Last();
+            */
+            CRUD crud = new CRUD();
+            await crud.Post();
+            await crud.Get();
+            Console.ReadKey();
 
+            /*
             var xmlRequest = new XMLWebRequest(baseURL);
             xmlRequest.Authenticate(username, password);
             
@@ -47,9 +55,10 @@ namespace version_control_tool
                 PullDataFromMirth(Connection, baseURl);
             else if (operation == "push")
                 PushAllChannelsIntoMirth(Connection, baseURl, id);
+            */
         }
 
-      
+      /*
         private static void PushAllChannelsIntoMirth(XMLWebRequest request, string baseUrl, string id)
         {
             XmlDocument document = new XmlDocument();
@@ -101,7 +110,7 @@ namespace version_control_tool
             WriteChannels(channelsXml, groupsXml);
         }
 
-        static void WriteCodeTemplatesLibraries(string codeTemplateXml)
+        private static void WriteCodeTemplatesLibraries(string codeTemplateXml)
         {
             var directoryName = "Libraries";
             Directory.CreateDirectory($"../../../remote/{directoryName}");
@@ -119,7 +128,7 @@ namespace version_control_tool
             }
         }
 
-        static void WriteCodeTemplates(string codeTemplateXml)
+        private static void WriteCodeTemplates(string codeTemplateXml)
         {
             XmlDocument codeTemplateDocument = new XmlDocument();
             var xDocCodeTemplate = XDocument.Parse(codeTemplateXml);
@@ -135,7 +144,8 @@ namespace version_control_tool
                 codeTemplateDocument.Save($"../../../remote/Libraries/{name}/{name}.xml");
             }
         }
-        static void WriteChannels(string channelsXml, string groupsXml)
+
+        private static void WriteChannels(string channelsXml, string groupsXml)
         {
             var groupChannelsWrapper = new List<Wrapper>();
             var directoryName = "Channels";
@@ -170,7 +180,8 @@ namespace version_control_tool
             OrganizeChannels(groupChannelsWrapper);
             Console.WriteLine($"Finished");
         }
-        static void OrganizeChannels(List<Wrapper> wrappers)
+
+        private static void OrganizeChannels(List<Wrapper> wrappers)
         {
             Console.WriteLine($"Organizing channels...");
             XmlDocument document = new XmlDocument();
@@ -190,6 +201,22 @@ namespace version_control_tool
                     }
                 }
             }
+        }
+      */
+        private static void HelloUser()
+        {
+            string message = "";
+            message += "**********************************************************************\n";
+            message += "**********************************************************************\n";
+            message += "*************************╔══╗*****************************************\n";
+            message += "*************************╚╗╔╝*****************************************\n";
+            message += "*************************╔╝( `v´ )************************************\n";
+            message += "*************************╚══`.¸.[You!]********************************\n";
+            message += "**********************************************************************\n";
+            message += "**********************************************************************\n";
+            message += "**********************************************************************\n";
+
+            Console.WriteLine(message);
         }
     }
 

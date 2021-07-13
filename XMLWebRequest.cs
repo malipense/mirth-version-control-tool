@@ -70,7 +70,7 @@ namespace version_control_tool
                 requestStream.Close();
             }
             */
-            throw new NotImplementedException;
+            throw new NotImplementedException();
         }
 
         private void UpdateCookies(HttpWebResponse response)
