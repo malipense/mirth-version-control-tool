@@ -11,8 +11,15 @@ namespace version_control_tool
     {
         private readonly HttpClient _httpClient;
         private readonly CookieContainer _cookieContainer;
-        public CRUD()
+        private readonly string _uri;
+        private readonly string _username;
+        private readonly string _password;
+        private bool _authenticated = false;
+        public CRUD(string uri, string username, string password)
         {
+            _uri = uri;
+            _username = username;
+            _password = password;
             _cookieContainer = new CookieContainer();
             _httpClient = GenerateClient();
         }
@@ -27,49 +34,53 @@ namespace version_control_tool
             return httpClient;
         }
 
-
-        public async Task Post()
+        public async Task Authenticate()
         {
+            Console.WriteLine("Authenticating...");
+            Uri uri = new Uri(_uri + Endpoints.Login);
             try
             {
                 var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("username" ,"admin"),
-                    new KeyValuePair<string, string>("password" ,"admin")
+                    new KeyValuePair<string, string>("username", _username),
+                    new KeyValuePair<string, string>("password", _password)
                 });
 
-                HttpResponseMessage response = await _httpClient.PostAsync("https://localhost:8443/api/users/_login", content);
+                HttpResponseMessage response = await _httpClient.PostAsync(uri, content);
                 response.EnsureSuccessStatusCode();
-                _cookieContainer.GetCookies(new Uri("https://localhost:8443/api/users/_login")).Cast<Cookie>();
+                _authenticated = true;
 
-                string responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("Authenticated!");
 
-                Console.WriteLine(responseBody);
+                _cookieContainer.GetCookies(uri).Cast<Cookie>();
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
+                Console.WriteLine("\nSomething went wrong!");
+                Console.WriteLine(e.Message);
             }
         }
 
-        public async Task Get()
+        public async Task<string> Get(string endpoint)
         {
+            if(!_authenticated)
+                await Authenticate();
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:8443/api/channels");
+                HttpResponseMessage response = await _httpClient.GetAsync(_uri + endpoint);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 Console.WriteLine(responseBody);
+                return responseBody;
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
+                Console.WriteLine("\nSomething went wrong!");
+                Console.WriteLine(e.Message);
+                return "";
             }
         }
 
-        
     }
 }
