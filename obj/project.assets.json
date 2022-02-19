@@ -52,23 +52,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\EduardoMalipense\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\Eduardo\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\dev\\mirth-version-controll-tool\\version-control-tool.csproj",
+      "projectUniqueName": "C:\\malipense\\apps\\mirth-version-controll-tool\\version-control-tool.csproj",
       "projectName": "version-control-tool",
-      "projectPath": "C:\\dev\\mirth-version-controll-tool\\version-control-tool.csproj",
-      "packagesPath": "C:\\Users\\EduardoMalipense\\.nuget\\packages\\",
-      "outputPath": "C:\\dev\\mirth-version-controll-tool\\obj\\",
+      "projectPath": "C:\\malipense\\apps\\mirth-version-controll-tool\\version-control-tool.csproj",
+      "packagesPath": "C:\\Users\\Eduardo\\.nuget\\packages\\",
+      "outputPath": "C:\\malipense\\apps\\mirth-version-controll-tool\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\EduardoMalipense\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Eduardo\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -80,6 +76,7 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
           "projectReferences": {}
         }
       },
@@ -91,6 +88,7 @@
     },
     "frameworks": {
       "netcoreapp3.1": {
+        "targetAlias": "netcoreapp3.1",
         "dependencies": {
           "Newtonsoft.Json": {
             "target": "Package",
@@ -107,12 +105,30 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[3.1.10, 3.1.10]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[3.1.22, 3.1.22]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[3.1.0, 3.1.0]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[3.1.0, 3.1.0]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.410\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.101\\RuntimeIdentifierGraph.json"
       }
     }
   }

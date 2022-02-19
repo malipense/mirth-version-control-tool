@@ -7,7 +7,6 @@ namespace version_control_tool
     {
         private static CRUD _crud;
         private static FolderManager _folderManager;
-        private delegate void Writer(string xmlContent);
 
         static async System.Threading.Tasks.Task Main(string[] args)
         {
@@ -55,13 +54,12 @@ namespace version_control_tool
             var codeTemplates = await _crud.Get(Endpoints.CodeTemplates);
             var channelGroups = await _crud.Get(Endpoints.ChannelGroups);
             var channels = await _crud.Get(Endpoints.Channels);
-            Writer templateWriter = new Writer(_folderManager.WriteTemplates);
-            Writer channelGroupsWriter = new Writer(_folderManager.WriteChannelGroups);
-            Writer channelsWriter = new Writer(_folderManager.WriteChannels);
-            
-            _folderManager.WriteFiles(codeTemplates, templateWriter);
-            _folderManager.WriteFiles(channelGroups, channelGroupsWriter);
-            _folderManager.WriteFiles(channels, channelsWriter);  
+
+            _folderManager.CreateFolders();
+            _folderManager.WriteTemplates(codeTemplates);
+            _folderManager.WriteChannelGroups(channelGroups);
+            _folderManager.WriteChannels(channels);
+            _folderManager.OrganizeChannels();
         }
 
         #region

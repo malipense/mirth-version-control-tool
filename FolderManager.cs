@@ -9,22 +9,16 @@ namespace version_control_tool
 {
     public class FolderManager
     {
-        private List<Wrapper> _channelGroupsWrapper;
+        private List<GroupWrapper> _channelGroupsWrapper;
         public FolderManager()
         {
-            _channelGroupsWrapper = new List<Wrapper>();
+            _channelGroupsWrapper = new List<GroupWrapper>();
         }
 
         public void CreateFolders()
         {
             Directory.CreateDirectory($"../../../remote/Libraries");
             Directory.CreateDirectory($"../../../remote/Channels");
-        }
-        public void WriteFiles(string xmlContent, Delegate @delegate)
-        {
-            CreateFolders();
-            @delegate.DynamicInvoke(xmlContent);
-            OrganizeChannels();
         }
 
         public void WriteTemplates(string xmlContent)
@@ -63,7 +57,7 @@ namespace version_control_tool
                 
                 foreach (XmlNode node in groupsDocument.GetElementsByTagName("id"))
                 {
-                    _channelGroupsWrapper.Add(new Wrapper(folderName, node.InnerText));
+                    _channelGroupsWrapper.Add(new GroupWrapper(folderName, node.InnerText));
                 }
                 
             }
@@ -84,7 +78,7 @@ namespace version_control_tool
             }
         }
 
-        private void OrganizeChannels()
+        public void OrganizeChannels()
         {
             Console.WriteLine($"Organizing channels...");
             XmlDocument document = new XmlDocument();
@@ -105,6 +99,5 @@ namespace version_control_tool
                 }
             }
         }
-
     }
 }
