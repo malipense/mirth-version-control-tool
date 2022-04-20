@@ -5,8 +5,8 @@ namespace version_control_tool
 {
     class Program
     {
-        private static CRUD _crud;
-        private static FolderManager _folderManager;
+        private static CRUDClient _crud;
+        private static IFolderManager _folderManager;
 
         static async System.Threading.Tasks.Task Main(string[] args)
         {
@@ -18,7 +18,10 @@ namespace version_control_tool
 
             
             if (args.Length == 0)
-                Console.WriteLine("Empty arguments");
+            {
+                Console.WriteLine("Empty arguments... rerun the application filling the required parameters.");
+                return;
+            }
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -37,8 +40,8 @@ namespace version_control_tool
             }
             operation = args.Last();
             
-            _crud = new CRUD(baseURL, username, password);
-            _folderManager = new FolderManager();
+            _crud = new CRUDClient(baseURL, username, password);
+            _folderManager = new FolderManagerJSON();
 
             if (operation == "pull")
                 await PullDataFromMirthAsync();
@@ -49,7 +52,7 @@ namespace version_control_tool
 
         private static async System.Threading.Tasks.Task PullDataFromMirthAsync()
         {
-            Console.WriteLine($"Pulling...");
+            Console.WriteLine($"Pulling Data from API - status:");
             
             var codeTemplates = await _crud.Get(Endpoints.CodeTemplates);
             var channelGroups = await _crud.Get(Endpoints.ChannelGroups);

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "version-control-tool": {
+      "commandName": "Project",
+      "commandLineArgs": "-server https://20.197.176.76:8443/api -username admin -password admin pull"
+    }
+  }
+}
