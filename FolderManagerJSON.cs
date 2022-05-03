@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
@@ -27,7 +29,9 @@ namespace version_control_tool
             //XmlDocument codeTemplateDocument = new XmlDocument();
             //var xDocFile = XDocument.Parse(xmlContent);
             var jsonObject = JObject.Parse(jsonContent);
-            if (jsonObject["list"] == null)
+            var listValue = jsonObject["list"].Value<string>();
+            var test = jsonObject["list"];
+            if (listValue == null)
             {
                 Console.WriteLine("Skipping creation of templates");
                 return;
@@ -50,49 +54,58 @@ namespace version_control_tool
 
         public void WriteChannelGroups(string jsonContent)
         {
-            //XmlDocument groupsDocument = new XmlDocument();
+            ChannelGroupObject? channelGroupListObject = null;
+            SingleChannelGroupObject? singleChannelGroupObject = null;
 
-            //var xDocGroups = XDocument.Parse(xmlContent);
-            //var xElementsGroups = xDocGroups.Root.Elements().ToArray();
-            var jsonObject = JObject.Parse(jsonContent);
-            if (jsonObject["list"] == null)
+            try
             {
-                Console.WriteLine("Skipping creation of templates");
-                return;
+                channelGroupListObject = JsonSerializer.Deserialize<ChannelGroupObject>(jsonContent);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("There is only a single channel group - object is not a list.");
+                singleChannelGroupObject = JsonSerializer.Deserialize<SingleChannelGroupObject>(jsonContent);
             }
 
-            var channelsArray = jsonObject["channels"];
-
-            //Console.WriteLine($"Saving data on /remote/Channels...");
-
-            //for (int i = 0; i < xElementsGroups.Length; i++)
-            //{
-            //    groupsDocument.LoadXml(xElementsGroups[i].ToString());
-            //    var folderName = groupsDocument.GetElementsByTagName("name")[0].InnerText;
-
-            //    Directory.CreateDirectory($"../../../remote/Channels/{folderName}");
-
-            //    foreach (XmlNode node in groupsDocument.GetElementsByTagName("id"))
-            //    {
-            //        _channelGroupsWrapper.Add(new GroupWrapper(folderName, node.InnerText));
-            //    }
-
-            //}
+            if(channelGroupListObject is null)
+            {
+                var channelName = singleChannelGroupObject.List.channelGroup.Name;
+                var channelId = singleChannelGroupObject.List.channelGroup.Id;
+                Directory.CreateDirectory($"../../../remote/Channels/{channelName}");
+                _channelGroupsWrapper.Add(new GroupWrapper(channelName, channelId));
+            }
+            else
+            {
+                foreach(var channelGroup in channelGroupListObject.List.channelGroupList)
+                {
+                    var channelName = channelGroup.Name;
+                    var channelId = channelGroup.Id;
+                    Directory.CreateDirectory($"../../../remote/Channels/{channelName}");
+                    _channelGroupsWrapper.Add(new GroupWrapper(channelName, channelId));
+                }
+            }
+            
+            Console.WriteLine($"Saving data on /remote/Channels...");
         }
 
         public void WriteChannels(string jsonContent)
         {
-            //XmlDocument channelsDocument = new XmlDocument();
+            var jsonObject = JObject.Parse(jsonContent);
+            var channelJsonObject = jsonObject["list"].Children().First();
+            var channelChildList = channelJsonObject.Children().First();
 
-            //var xDocChannels = XDocument.Parse(xmlContent);
-            //var xElementsChannels = xDocChannels.Root.Elements().ToArray();
-
-            //for (int i = 0; i < xElementsChannels.Length; i++)
-            //{
-            //    channelsDocument.LoadXml(xElementsChannels[i].ToString());
-            //    var name = channelsDocument.GetElementsByTagName("name")[0].InnerText;
-            //    channelsDocument.Save($"../../../remote/Channels/{name}.xml");
-            //}
+            string channelJson = "";
+            if (channelChildList.Type.ToString() == "Array")
+            {
+                foreach (var item in channelChildList)
+                {
+                    var name = item.Value<string>("name");
+                    channelJson = item.ToString();
+                    File.WriteAllText($"../../../remote/Channels/{name}.json", channelJson);
+                }
+            }
+            else
+                channelJson = channelChildList.ToString();
         }
 
         public void OrganizeChannels()
@@ -116,5 +129,34 @@ namespace version_control_tool
             //    }
             //}
         }
+    }
+
+    public class ChannelGroupObject
+    {
+        [JsonPropertyName("list")]
+        public ListWithMultipleGroups List { get; set; }
+    }
+    public class ListWithMultipleGroups
+    {
+        [JsonPropertyName("channelGroup")]
+        public ChannelGroup[] channelGroupList { get; set; }
+    }
+
+    public class SingleChannelGroupObject
+    {
+        [JsonPropertyName("list")]
+        public ListWithSingleGroups List { get; set; }
+    }
+    public class ListWithSingleGroups
+    {
+        public ChannelGroup channelGroup { get; set; }
+    }
+
+    public class ChannelGroup
+    {
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
     }
 }

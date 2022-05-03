@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace version_control_tool
@@ -83,6 +85,9 @@ namespace version_control_tool
 
                 var j = JObject.Parse(responseBody);
                 var resultsAmount = j["list"].Count() > 0 ? "found" : "none";
+
+                //var j = XDocument.Parse(responseBody);
+                //var resultsAmount = j.Root.Elements().ToArray().Count() > 0 ? "found" : "none";
 
                 Console.WriteLine(
                     $"-------------------------------------------------------------\n" +
