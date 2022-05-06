@@ -4,13 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace version_control_tool
 {
-    class CRUDClient
+    class ApiHttpClient
     {
         private readonly HttpClient _httpClient;
         private readonly CookieContainer _cookieContainer;
@@ -18,7 +17,7 @@ namespace version_control_tool
         private readonly string _username;
         private readonly string _password;
         private bool _authenticated = false;
-        public CRUDClient(string uri, string username, string password)
+        public ApiHttpClient(string uri, string username, string password)
         {
             _uri = uri;
             _username = username;
@@ -35,7 +34,7 @@ namespace version_control_tool
 
             HttpClient httpClient = new HttpClient(clientHandler);
             httpClient.DefaultRequestHeaders.Accept.Add(
-                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json")
+                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/xml")
                 );
 
             return httpClient;
@@ -72,7 +71,7 @@ namespace version_control_tool
             }
         }
 
-        public async Task<string> Get(string endpoint)
+        public async Task<string> GetAsync(string endpoint)
         {
             if(!_authenticated)
                 await Authenticate();
@@ -83,11 +82,11 @@ namespace version_control_tool
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
 
-                var j = JObject.Parse(responseBody);
-                var resultsAmount = j["list"].Count() > 0 ? "found" : "none";
+                //var j = JObject.Parse(responseBody);
+                //var resultsAmount = j["list"].Count() > 0 ? "found" : "none";
 
-                //var j = XDocument.Parse(responseBody);
-                //var resultsAmount = j.Root.Elements().ToArray().Count() > 0 ? "found" : "none";
+                var j = XDocument.Parse(responseBody);
+                var resultsAmount = j.Root.Elements().ToArray().Count() > 0 ? "found" : "none";
 
                 Console.WriteLine(
                     $"-------------------------------------------------------------\n" +

@@ -20,8 +20,9 @@ namespace version_control_tool
 
         public void CreateFolders()
         {
-            Directory.CreateDirectory($"../../../remote/Libraries");
-            Directory.CreateDirectory($"../../../remote/Channels");
+            throw new NotImplementedException();
+            //Directory.CreateDirectory($"../../../remote/Libraries");
+            //Directory.CreateDirectory($"../../../remote/Channels");
         }
 
         public void WriteTemplates(string jsonContent)
@@ -52,7 +53,7 @@ namespace version_control_tool
             //}
         }
 
-        public void WriteChannelGroups(string jsonContent)
+        public void WriteChannelGroups(string jsonContent, string path = "../../../remote/Channels")
         {
             ChannelGroupObject? channelGroupListObject = null;
             SingleChannelGroupObject? singleChannelGroupObject = null;
@@ -70,8 +71,8 @@ namespace version_control_tool
             if(channelGroupListObject is null)
             {
                 var channelName = singleChannelGroupObject.List.channelGroup.Name;
-                var channelId = singleChannelGroupObject.List.channelGroup.Id;
-                Directory.CreateDirectory($"../../../remote/Channels/{channelName}");
+                var channelId = singleChannelGroupObject.List.channelGroup.Channels.Channel.Id;
+                Directory.CreateDirectory($"{path}/Channels/{channelName}");
                 _channelGroupsWrapper.Add(new GroupWrapper(channelName, channelId));
             }
             else
@@ -79,16 +80,16 @@ namespace version_control_tool
                 foreach(var channelGroup in channelGroupListObject.List.channelGroupList)
                 {
                     var channelName = channelGroup.Name;
-                    var channelId = channelGroup.Id;
-                    Directory.CreateDirectory($"../../../remote/Channels/{channelName}");
+                    var channelId = channelGroup.Channels.Channel.Id;
+                    Directory.CreateDirectory($"{path}/Channels/{channelName}");
                     _channelGroupsWrapper.Add(new GroupWrapper(channelName, channelId));
                 }
             }
             
-            Console.WriteLine($"Saving data on /remote/Channels...");
+            Console.WriteLine($"Saving data on {path}...");
         }
 
-        public void WriteChannels(string jsonContent)
+        public void WriteChannels(string jsonContent, string path = "../../../remote/Channels")
         {
             var jsonObject = JObject.Parse(jsonContent);
             var channelJsonObject = jsonObject["list"].Children().First();
@@ -101,33 +102,38 @@ namespace version_control_tool
                 {
                     var name = item.Value<string>("name");
                     channelJson = item.ToString();
-                    File.WriteAllText($"../../../remote/Channels/{name}.json", channelJson);
+                    File.WriteAllText($"{path}/Channels/{name}.json", channelJson);
                 }
             }
             else
                 channelJson = channelChildList.ToString();
         }
 
+        public void OrganizeChannels(string path)
+        {
+            Console.WriteLine($"Organizing channels...");
+            
+            var files = Directory.EnumerateFiles($"{path}/Channels", "*.json").ToArray();
+            
+            for (var i = 0; i < files.Length; i++)
+            {
+                var fileName = Path.GetFileName(files[i]);
+                JObject jFile = JObject.Parse(File.ReadAllText($"{path}/Channels/{fileName}"));
+                var channelId = jFile.Value<string>("id");
+                foreach (var wrapper in _channelGroupsWrapper)
+                {
+                    if (wrapper.id == channelId)
+                    {
+                        if (!File.Exists($"{path}/Channels/{wrapper.groupName}/{fileName}"))
+                            File.Move(files[i], $"{path}/Channels/{wrapper.groupName}/{fileName}");
+                    }
+                }
+            }
+        }
+
         public void OrganizeChannels()
         {
-            //Console.WriteLine($"Organizing channels...");
-            //XmlDocument document = new XmlDocument();
-            //var files = Directory.EnumerateFiles("../../../remote/Channels", "*.xml").ToArray();
-
-            //for (var i = 0; i < files.Length; i++)
-            //{
-            //    var fileName = Path.GetFileName(files[i]);
-            //    document.Load(files[i]);
-            //    var channelId = document.GetElementsByTagName("id")[0].InnerText;
-            //    foreach (var wrapper in _channelGroupsWrapper)
-            //    {
-            //        if (wrapper.id == channelId)
-            //        {
-            //            if (!File.Exists($"../../../remote/Channels/{wrapper.groupName}/{fileName}"))
-            //                File.Move(files[i], $"../../../remote/Channels/{wrapper.groupName}/{fileName}");
-            //        }
-            //    }
-            //}
+            throw new NotImplementedException();
         }
     }
 
@@ -155,8 +161,20 @@ namespace version_control_tool
     public class ChannelGroup
     {
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public string GroupId { get; set; }
         [JsonPropertyName("name")]
         public string Name { get; set; }
+        [JsonPropertyName("channels")]
+        public Channels Channels { get; set; }
+    }
+    public class Channels
+    {
+        [JsonPropertyName("channel")]
+        public Channel Channel { get; set; }
+    }
+    public class Channel
+    {
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
     }
 }

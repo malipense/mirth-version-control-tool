@@ -3,8 +3,8 @@
     internal interface IFolderManager
     {
         public void WriteTemplates(string content);
-        public void WriteChannelGroups(string content);
-        public void WriteChannels(string content);
+        public void WriteChannelGroups(string content, string path);
+        public void WriteChannels(string content, string path);
         public void OrganizeChannels();
         public void CreateFolders();
     }

@@ -39,21 +39,21 @@ namespace version_control_tool
             }
         }
 
-        public void WriteChannelGroups(string xmlContent)
+        public void WriteChannelGroups(string xmlContent, string path = "../../../remote")
         {
             XmlDocument groupsDocument = new XmlDocument();
 
             var xDocGroups = XDocument.Parse(xmlContent);
             var xElementsGroups = xDocGroups.Root.Elements().ToArray();
 
-            Console.WriteLine($"Saving data on /remote/Channels...");
+            Console.WriteLine($"Saving data on {path}/Channels...");
 
             for (int i = 0; i < xElementsGroups.Length; i++)
             {
                 groupsDocument.LoadXml(xElementsGroups[i].ToString());
                 var folderName = groupsDocument.GetElementsByTagName("name")[0].InnerText;
 
-                Directory.CreateDirectory($"../../../remote/Channels/{folderName}");
+                Directory.CreateDirectory($"{path}/Channels/{folderName}");
                 
                 foreach (XmlNode node in groupsDocument.GetElementsByTagName("id"))
                 {
@@ -63,7 +63,7 @@ namespace version_control_tool
             }
         }
 
-        public void WriteChannels(string xmlContent)
+        public void WriteChannels(string xmlContent, string path = "../../../remote")
         {
             XmlDocument channelsDocument = new XmlDocument();
 
@@ -74,15 +74,15 @@ namespace version_control_tool
             {
                 channelsDocument.LoadXml(xElementsChannels[i].ToString());
                 var name = channelsDocument.GetElementsByTagName("name")[0].InnerText;
-                channelsDocument.Save($"../../../remote/Channels/{name}.xml");
+                channelsDocument.Save($"{path}/Channels/{name}.xml");
             }
         }
 
-        public void OrganizeChannels()
+        public void OrganizeChannels(string path)
         {
             Console.WriteLine($"Organizing channels...");
             XmlDocument document = new XmlDocument();
-            var files = Directory.EnumerateFiles("../../../remote/Channels", "*.xml").ToArray();
+            var files = Directory.EnumerateFiles($"{path}/Channels", "*.xml").ToArray();
 
             for (var i = 0; i < files.Length; i++)
             {
@@ -93,11 +93,16 @@ namespace version_control_tool
                 {
                     if (wrapper.id == channelId)
                     {
-                        if (!File.Exists($"../../../remote/Channels/{wrapper.groupName}/{fileName}"))
-                            File.Move(files[i], $"../../../remote/Channels/{wrapper.groupName}/{fileName}");
+                        if (!File.Exists($"{path}/Channels/{wrapper.groupName}/{fileName}"))
+                            File.Move(files[i], $"{path}/Channels/{wrapper.groupName}/{fileName}");
                     }
                 }
             }
+        }
+
+        public void OrganizeChannels()
+        {
+            throw new NotImplementedException();
         }
     }
 }

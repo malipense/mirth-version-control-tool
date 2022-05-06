@@ -1,68 +1,181 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using version_control_tool.Commands;
 
 namespace version_control_tool
 {
     class Program
     {
-        private static CRUDClient _crud;
         private static IFolderManager _folderManager;
-
         static async System.Threading.Tasks.Task Main(string[] args)
         {
             HelloUser();
-            string username = "";
-            string password = "";
-            string baseURL = "";
-            string operation = "";
+            //string username = "";
+            //string password = "";
+            //string baseURL = "";
+            //string operation = "";
 
-            
-            if (args.Length == 0)
+            while(true)
             {
-                Console.WriteLine("Empty arguments... rerun the application filling the required parameters.");
-                return;
-            }
-
-            for (int i = 0; i < args.Length; i++)
-            {
-                switch (args[i])
+                string[] inputCommandBlocks = Console.ReadLine().Trim().Split('|');
+                if (inputCommandBlocks.Length == 0)
                 {
-                    case "-server":
-                        baseURL = args[i + 1];
-                        break;
-                    case "-username":
-                        username = args[i + 1];
-                        break;
-                    case "-password":
-                        password = args[i + 1];
-                        break;
+                    //no commands
+                    Console.WriteLine("Empty arguments... rerun the application filling the required parameters.");
+                    return;
+                }
+                else if (inputCommandBlocks.Length == 1)
+                {
+                    //one block on execution
+                    var executionResult = ExecuteCommand(inputCommandBlocks[0]);
+
+                    Console.WriteLine("\n");
+                    Console.WriteLine(executionResult);
+                }
+                else
+                {
+                    //two or more blocks of execution
+                    string chainedResult = null;
+
+                    for (int i = 0; i < inputCommandBlocks.Length; i++)
+                    {
+                        Console.Clear();
+                        if (chainedResult == null)
+                        {
+                            chainedResult = ExecuteCommand(inputCommandBlocks[0].ToLower());
+                            continue;
+                        }
+                        chainedResult = ExecuteCommand(inputCommandBlocks[i].ToLower(), chainedResult);
+
+                        Console.WriteLine("\n");
+                        Console.WriteLine(chainedResult);
+                    }
                 }
             }
-            operation = args.Last();
             
-            _crud = new CRUDClient(baseURL, username, password);
-            _folderManager = new FolderManagerJSON();
-
-            if (operation == "pull")
-                await PullDataFromMirthAsync();
-
-            Console.ReadKey();
+            //for (int i = 0; i < args.Length; i++)
+            //{
+            //    switch (args[i])
+            //    {
+            //        case "-server":
+            //            baseURL = args[i + 1];
+            //            break;
+            //        case "-username":
+            //            username = args[i + 1];
+            //            break;
+            //        case "-password":
+            //            password = args[i + 1];
+            //            break;
+            //    }
+            //}
+            //operation = args.Last();
             
+            //_folderManager = new FolderManagerJSON();
+
+            //if (operation == "pull")
+            //    await PullDataFromMirthAsync();
         }
 
+        private static bool ValidateArguments(string[] args, string[] targetArgs)
+        {
+            bool succedeed = false;
+            bool found = false;
+            var validations = new List<bool>();
+            foreach (var arg in args)
+            {
+                foreach (var target in targetArgs)
+                {
+                    if (arg == target)
+                    {
+                        found = true;
+                        break;
+                    }
+                    else
+                        found = false;
+                }
+                if(found)
+                    validations.Add(true);
+                else
+                    validations.Add(false);
+            }
+
+            foreach (var items in validations)
+            {
+                if (!items)
+                {
+                    succedeed = false;
+                    break;
+                }
+                else
+                    succedeed = true;
+            }
+
+            return succedeed;
+        }
+        private static string ExecuteCommand(string inputCommand, string data = null)
+        {
+            ICommand command = null;
+            Dictionary<string,string> keyValuePairs = new Dictionary<string,string>();
+            
+            List<string> args = new List<string>();
+            List<string> values = new List<string>();
+
+            var commandParametersAndValueList = inputCommand.Trim().Split(' ');
+
+            string commandName = commandParametersAndValueList[0];
+            command = CommandList.commands.FirstOrDefault(c => c.Name == commandParametersAndValueList[0].ToLower());
+            if(command == null)
+                return "Command not found";
+
+            if(commandParametersAndValueList.Length > 1)
+            {
+                if(data != null)
+                {
+                    args.Add("-data");
+                    values.Add(data);
+                }
+
+                for (int i = 1; i < commandParametersAndValueList.Length; i++)
+                {
+                    if (commandParametersAndValueList[i].StartsWith('-'))
+                        args.Add(commandParametersAndValueList[i]);
+                    else
+                        values.Add(commandParametersAndValueList[i]);
+                }
+                if (values.Count() == 0 && args.Count() > 0)
+                    return "No value provided for the parameter.";
+
+                var valid = ValidateArguments(args.ToArray(), command.Parameters);
+                if (!valid)
+                    return "Parameter not found";
+
+                for (int i = 0; i < args.Count; i++)
+                {
+                    keyValuePairs.Add(args[i].ToLower(), values[i].ToLower());
+                }
+
+                return command.CallBack(keyValuePairs);
+            }
+            else
+            {
+                return command.CallBack();
+            }
+        }
+        
         private static async System.Threading.Tasks.Task PullDataFromMirthAsync()
         {
-            Console.WriteLine($"Pulling Data from API - status:");
+            //Console.WriteLine($"Pulling Data from API - status:");
             
-            var codeTemplates = await _crud.Get(Endpoints.CodeTemplates);
-            var channelGroups = await _crud.Get(Endpoints.ChannelGroups);
-            var channels = await _crud.Get(Endpoints.Channels);
+            //var codeTemplates = await _crud.Get(Endpoints.CodeTemplates);
+            //var channelGroups = await _crud.Get(Endpoints.ChannelGroups);
+            //var channels = await _crud.Get(Endpoints.Channels);
 
-            _folderManager.CreateFolders();
-            _folderManager.WriteTemplates(codeTemplates);
-            _folderManager.WriteChannelGroups(channelGroups);
-            _folderManager.WriteChannels(channels);
-            _folderManager.OrganizeChannels();
+            //_folderManager.CreateFolders();
+            //_folderManager.WriteTemplates(codeTemplates);
+            //_folderManager.WriteChannelGroups(channelGroups);
+            //_folderManager.WriteChannels(channels);
+            //_folderManager.OrganizeChannels();
         }
 
         #region
