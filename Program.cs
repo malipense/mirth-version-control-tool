@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using version_control_tool.Commands;
+using NextGen.Cli.Commands;
 
-namespace version_control_tool
+namespace NextGen.Cli
 {
     class Program
     {
         private static IFolderManager _folderManager;
-        static async System.Threading.Tasks.Task Main(string[] args)
+        static void Main(string[] args)
         {
             HelloUser();
-            //string username = "";
-            //string password = "";
-            //string baseURL = "";
-            //string operation = "";
 
             while(true)
             {
@@ -28,7 +24,7 @@ namespace version_control_tool
                 else if (inputCommandBlocks.Length == 1)
                 {
                     //one block on execution
-                    var executionResult = ExecuteCommand(inputCommandBlocks[0]);
+                    var executionResult = TryExecuteCommand(inputCommandBlocks[0]);
 
                     Console.WriteLine("\n");
                     Console.WriteLine(executionResult);
@@ -43,38 +39,16 @@ namespace version_control_tool
                         Console.Clear();
                         if (chainedResult == null)
                         {
-                            chainedResult = ExecuteCommand(inputCommandBlocks[0].ToLower());
+                            chainedResult = TryExecuteCommand(inputCommandBlocks[0].ToLower());
                             continue;
                         }
-                        chainedResult = ExecuteCommand(inputCommandBlocks[i].ToLower(), chainedResult);
+                        chainedResult = TryExecuteCommand(inputCommandBlocks[i].ToLower(), chainedResult);
 
                         Console.WriteLine("\n");
                         Console.WriteLine(chainedResult);
                     }
                 }
             }
-            
-            //for (int i = 0; i < args.Length; i++)
-            //{
-            //    switch (args[i])
-            //    {
-            //        case "-server":
-            //            baseURL = args[i + 1];
-            //            break;
-            //        case "-username":
-            //            username = args[i + 1];
-            //            break;
-            //        case "-password":
-            //            password = args[i + 1];
-            //            break;
-            //    }
-            //}
-            //operation = args.Last();
-            
-            //_folderManager = new FolderManagerJSON();
-
-            //if (operation == "pull")
-            //    await PullDataFromMirthAsync();
         }
 
         private static bool ValidateArguments(string[] args, string[] targetArgs)
@@ -113,7 +87,7 @@ namespace version_control_tool
 
             return succedeed;
         }
-        private static string ExecuteCommand(string inputCommand, string data = null)
+        private static string TryExecuteCommand(string inputCommand, string data = null)
         {
             ICommand command = null;
             Dictionary<string,string> keyValuePairs = new Dictionary<string,string>();

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace version_control_tool.Commands
+namespace NextGen.Cli.Commands
 {
     public class OutputFile : ICommand
     {

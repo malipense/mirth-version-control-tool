@@ -1,6 +1,6 @@
-﻿using version_control_tool.Commands;
+﻿using NextGen.Cli.Commands;
 
-namespace version_control_tool
+namespace NextGen.Cli
 {
     internal static class CommandList
     {

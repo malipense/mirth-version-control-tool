@@ -5,7 +5,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace version_control_tool
+namespace NextGen.Cli
 {
     public class FolderManagerXML : IFolderManager
     {

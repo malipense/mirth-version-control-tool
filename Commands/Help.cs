@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace version_control_tool.Commands
+namespace NextGen.Cli.Commands
 {
     public class Help : ICommand
     {

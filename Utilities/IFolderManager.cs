@@ -1,4 +1,4 @@
-﻿namespace version_control_tool
+﻿namespace NextGen.Cli
 {
     internal interface IFolderManager
     {

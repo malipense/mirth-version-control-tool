@@ -1,7 +1,9 @@
-﻿using System;
+﻿using NextGen.Cli.Commands;
+using System;
 using System.Collections.Generic;
+using APIClient;
 
-namespace version_control_tool.Commands
+namespace NextGen.Cli
 {
     public class Pull : ICommand
     {

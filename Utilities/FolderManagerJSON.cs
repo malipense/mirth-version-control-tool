@@ -8,7 +8,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 
-namespace version_control_tool
+namespace NextGen.Cli
 {
     public class FolderManagerJSON : IFolderManager
     {
