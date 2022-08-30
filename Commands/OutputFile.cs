@@ -8,14 +8,15 @@ namespace NextGen.Cli.Commands
     {
         private string[] _parameters = new string[4]
         {
-            "-path",
-            "-extension",
-            "-name",
-            "-data"
+            "--path",
+            "--extension",
+            "--name",
+            "--data"
         };
-        public string Name { get => "outputfile"; }
-        public string[] Parameters { get => _parameters; }
-        public string CallBack(Dictionary<string, string> parameters)
+        public string Name => "outputfile";
+        public string Description => "writes file to a specified directory";
+        public string[] Parameters => _parameters;
+        public string Execute(Dictionary<string, string> parameters)
         {
             string output = null;
             string path = null;
@@ -27,8 +28,8 @@ namespace NextGen.Cli.Commands
             parameters.TryGetValue("-name", out name);
             
             if (!Directory.Exists(path))
-
                 Directory.CreateDirectory(path);
+
             try
             {
                 output = $"Writting file to {path}...";
@@ -42,9 +43,9 @@ namespace NextGen.Cli.Commands
 
             return output;
         }
-        public string CallBack()
+        public string Execute()
         {
-            throw new NotImplementedException();
+            return "This command requires the parameters to be filled, type help to see information.";
         }
     }
 }

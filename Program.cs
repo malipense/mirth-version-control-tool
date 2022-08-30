@@ -7,7 +7,6 @@ namespace NextGen.Cli
 {
     class Program
     {
-        private static IFolderManager _folderManager;
         static void Main(string[] args)
         {
             HelloUser();
@@ -15,12 +14,10 @@ namespace NextGen.Cli
             while(true)
             {
                 string[] inputCommandBlocks = Console.ReadLine().Trim().Split('|');
-                if (inputCommandBlocks.Length == 0)
-                {
-                    //no commands
-                    Console.WriteLine("Empty arguments... rerun the application filling the required parameters.");
-                    return;
-                }
+
+                if (inputCommandBlocks.Length == 1 && string.IsNullOrEmpty(inputCommandBlocks[0])) //no commands
+                    Console.WriteLine("Type HELP to get a list of available commands");
+
                 else if (inputCommandBlocks.Length == 1)
                 {
                     //one block on execution
@@ -55,7 +52,7 @@ namespace NextGen.Cli
         {
             bool succedeed = false;
             bool found = false;
-            var validations = new List<bool>();
+            var results = new List<bool>();
             foreach (var arg in args)
             {
                 foreach (var target in targetArgs)
@@ -69,14 +66,14 @@ namespace NextGen.Cli
                         found = false;
                 }
                 if(found)
-                    validations.Add(true);
+                    results.Add(true);
                 else
-                    validations.Add(false);
+                    results.Add(false);
             }
 
-            foreach (var items in validations)
+            foreach (var success in results)
             {
-                if (!items)
+                if (!success)
                 {
                     succedeed = false;
                     break;
@@ -87,7 +84,7 @@ namespace NextGen.Cli
 
             return succedeed;
         }
-        private static string TryExecuteCommand(string inputCommand, string data = null)
+        private static string TryExecuteCommand(string inputCommand, string previousCommandResult = null)
         {
             ICommand command = null;
             Dictionary<string,string> keyValuePairs = new Dictionary<string,string>();
@@ -98,21 +95,23 @@ namespace NextGen.Cli
             var commandParametersAndValueList = inputCommand.Trim().Split(' ');
 
             string commandName = commandParametersAndValueList[0];
+
+
             command = CommandList.commands.FirstOrDefault(c => c.Name == commandParametersAndValueList[0].ToLower());
             if(command == null)
                 return "Command not found";
-
+            
             if(commandParametersAndValueList.Length > 1)
             {
-                if(data != null)
+                if(previousCommandResult != null)
                 {
-                    args.Add("-data");
-                    values.Add(data);
+                    args.Add("--data");
+                    values.Add(previousCommandResult);
                 }
 
                 for (int i = 1; i < commandParametersAndValueList.Length; i++)
                 {
-                    if (commandParametersAndValueList[i].StartsWith('-'))
+                    if (commandParametersAndValueList[i].StartsWith("--"))
                         args.Add(commandParametersAndValueList[i]);
                     else
                         values.Add(commandParametersAndValueList[i]);
@@ -129,12 +128,10 @@ namespace NextGen.Cli
                     keyValuePairs.Add(args[i].ToLower(), values[i].ToLower());
                 }
 
-                return command.CallBack(keyValuePairs);
+                return command.Execute(keyValuePairs);
             }
             else
-            {
-                return command.CallBack();
-            }
+                return command.Execute();
         }
         
         private static async System.Threading.Tasks.Task PullDataFromMirthAsync()

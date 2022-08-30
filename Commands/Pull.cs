@@ -9,20 +9,21 @@ namespace NextGen.Cli
     {
         private string[] _parameters = new string[6]
         {
-            "-server",
-            "-username",
-            "-password",
-            "-path",
-            "-dataType",
-            "-resource"
+            "--server",
+            "--username",
+            "--password",
+            "--path",
+            "--dataType",
+            "--resource"
         };
-        public string Name => "pull";
+        public string Name => "mirthpull";
+        public string Description => "pulls data from remote NextGen/Mirth server. Saves it to the provided path as xml.";
         public string[] Parameters => _parameters;
-        public string CallBack()
+        public string Execute()
         {
-            return "This command requires parameters";
+            return "This command requires the parameters to be filled, type help to see information.";
         }
-        public string CallBack(Dictionary<string, string> parameters)
+        public string Execute(Dictionary<string, string> parameters)
         {
             string output = null;
             string server = null;
