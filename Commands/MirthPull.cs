@@ -5,7 +5,7 @@ using APIClient;
 
 namespace NextGen.Cli
 {
-    public class Pull : ICommand
+    public class MirthPull : ICommand
     {
         private string[] _parameters = new string[6]
         {
@@ -32,18 +32,18 @@ namespace NextGen.Cli
             string path = null;
             string resource = null;
             
-            parameters.TryGetValue("-server", out server);
-            parameters.TryGetValue("-username", out username);
-            parameters.TryGetValue("-password", out password);
-            parameters.TryGetValue("-path", out path);
-            parameters.TryGetValue("-resource", out resource);
+            parameters.TryGetValue("--server", out server);
+            parameters.TryGetValue("--username", out username);
+            parameters.TryGetValue("--password", out password);
+            parameters.TryGetValue("--path", out path);
+            parameters.TryGetValue("--resource", out resource);
 
-            ApiHttpClient apiHttpClient = new ApiHttpClient(server, username, password);
+            MirthHttpClient mirthHttpClient = new MirthHttpClient(server, username, password);
             string channels = null;
             string channelGroups = null;
             
-            channels = apiHttpClient.GetAsync(Endpoints.Channels).Result;
-            channelGroups = apiHttpClient.GetAsync(Endpoints.ChannelGroups).Result;
+            channels = mirthHttpClient.GetAsync(Endpoints.Channels).Result;
+            channelGroups = mirthHttpClient.GetAsync(Endpoints.ChannelGroups).Result;
 
             var folderManager = new FolderManagerXML();
             try

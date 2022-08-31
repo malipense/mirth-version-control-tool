@@ -6,11 +6,11 @@ namespace NextGen.Cli
     {
         public static ICommand[] commands =
         {
-            //new Command("pull", new string[] {"server", "username", "password"}, Do)
             new Help(),
             new OutputFile(),
-            new Pull(),
-            new Exit()
+            new MirthPull(),
+            new Exit(),
+            new Commit()
         };
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NextGen.Cli.Commands;
 
@@ -101,9 +102,9 @@ namespace NextGen.Cli
             if(command == null)
                 return "Command not found";
             
-            if(commandParametersAndValueList.Length > 1)
+            if(commandParametersAndValueList.Length > 1)//Command takes parameters, so validate that
             {
-                if(previousCommandResult != null)
+                if(previousCommandResult != null) //If the result of a previous command is piped, adds --data parameter
                 {
                     args.Add("--data");
                     values.Add(previousCommandResult);
@@ -121,12 +122,10 @@ namespace NextGen.Cli
 
                 var valid = ValidateArguments(args.ToArray(), command.Parameters);
                 if (!valid)
-                    return "Parameter not found";
+                    return "The provided parameters do not match with the ones specified for this command.";
 
                 for (int i = 0; i < args.Count; i++)
-                {
                     keyValuePairs.Add(args[i].ToLower(), values[i].ToLower());
-                }
 
                 return command.Execute(keyValuePairs);
             }

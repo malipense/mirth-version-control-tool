@@ -5,42 +5,16 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Newtonsoft.Json.Linq;
 
 namespace APIClient
 {
-    public class ApiHttpClient
+    public class MirthHttpClient : BaseClient
     {
-        private readonly HttpClient _httpClient;
-        private readonly CookieContainer _cookieContainer;
-        private readonly string _uri;
-        private readonly string _username;
-        private readonly string _password;
-        private bool _authenticated = false;
-        public ApiHttpClient(string uri, string username, string password)
-        {
-            _uri = uri;
-            _username = username;
-            _password = password;
-            _cookieContainer = new CookieContainer();
-            _httpClient = GenerateClient();
-        }
+        public MirthHttpClient(string uri, string username, string password) :base(uri, username, password)
+        {   }
 
-        private HttpClient GenerateClient()
-        {
-            HttpClientHandler clientHandler = new HttpClientHandler();
-            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-            clientHandler.CookieContainer = _cookieContainer;
-
-            HttpClient httpClient = new HttpClient(clientHandler);
-            httpClient.DefaultRequestHeaders.Accept.Add(
-                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/xml")
-                );
-
-            return httpClient;
-        }
-
-        public async Task Authenticate()
+        
+        public override async Task Authenticate()
         {
             Console.WriteLine("Authenticating user...\n");
             Uri uri = new Uri(_uri + Endpoints.Login);
@@ -71,7 +45,7 @@ namespace APIClient
             }
         }
 
-        public async Task<string> GetAsync(string endpoint)
+        public override async Task<string> GetAsync(string endpoint)
         {
             if(!_authenticated)
                 await Authenticate();
@@ -104,5 +78,24 @@ namespace APIClient
             }
         }
 
+        public override async Task<string> OptionsAsync()
+        {
+            try
+            {
+                HttpRequestMessage request = new HttpRequestMessage();
+                request.Method = HttpMethod.Options;
+                HttpResponseMessage response = await _httpClient.SendAsync(request);
+
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                return responseBody;
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine("\nSomething went wrong!");
+                Console.WriteLine(e.Message);
+                return "";
+            }
+        }
     }
 }
