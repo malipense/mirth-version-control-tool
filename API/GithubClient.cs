@@ -3,57 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace APIClient
 {
     public class GithubClient : BaseClient
     {
-        public GithubClient(string uri, string username, string password) :base(uri, username, password)
-        {   }
-        public override async Task Authenticate()
+        private readonly string _token;
+        public GithubClient(string uri, string token) :base(uri, null, null)
         {
-            Console.WriteLine("Authenticating user...\n");
-            var uri = new Uri(_uri);
-            try
-            {
-                var content = new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("username", _username),
-                    new KeyValuePair<string, string>("password", _password)
-                });
-
-                HttpResponseMessage response = await _httpClient.PostAsync(uri, content);
-                response.EnsureSuccessStatusCode();
-                _authenticated = true;
-
-                Console.WriteLine(
-                    $"---------------------\n" +
-                    $"|User authenticated!|\n" +
-                    $"---------------------\n");
-
-                _cookieContainer.GetCookies(uri).Cast<Cookie>();
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nSomething went wrong!");
-                Console.WriteLine(e.Message);
-                Environment.Exit(1);
-            }
+            _token = token;
         }
-
-        public override async Task<string> GetAsync(string endpoint)
+        public override async Task<string> GetAsync(string path)
         {
-            var token = "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";
-            Uri uri = new Uri(_uri + endpoint);
+            Uri uri = new Uri(_baseUri + path);
 
             try
             {
                 _httpClient.DefaultRequestHeaders.Add("User-Agent", "mirth-tool-github-client");
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _token);
 
-                Console.WriteLine("Retriving data - status:");
-                HttpResponseMessage response = await _httpClient.GetAsync(_uri + endpoint);
+                Console.WriteLine("Requesting data from github...");
+                HttpResponseMessage response = await _httpClient.GetAsync(uri);
                 
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
@@ -68,22 +41,27 @@ namespace APIClient
             }
         }
 
-        public async Task<string> PostAsync(string endpoint)
+        public async Task<string> PutAsync(string path, CommitBody body)
         {
-            var token = "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";
-
+            Uri uri = new Uri(_baseUri + path);
             try
-            {
-               
+            {               
                 _httpClient.DefaultRequestHeaders.Add("User-Agent", "mirth-tool-github-client");
-                _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _token);
 
-                Console.WriteLine("Retriving data - status:");
-                HttpResponseMessage response = await _httpClient.GetAsync(_uri + endpoint);
+                Console.WriteLine("Comminting changes to repository");
+
+                JsonSerializerOptions jsonOptions = new JsonSerializerOptions();
+                jsonOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+
+                var jsonBody = JsonSerializer.Serialize(body, jsonOptions);
+
+                var httpContent = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await _httpClient.PutAsync(uri, httpContent);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
                 
-
                 return responseBody;
             }
             catch (HttpRequestException e)
@@ -95,6 +73,11 @@ namespace APIClient
         }
 
         public override Task<string> OptionsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task Authenticate()
         {
             throw new NotImplementedException();
         }

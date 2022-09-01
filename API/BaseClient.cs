@@ -8,14 +8,14 @@ namespace APIClient
     {
         protected readonly HttpClient _httpClient;
         protected readonly CookieContainer _cookieContainer;
-        protected readonly string _uri;
+        protected readonly string _baseUri;
         protected readonly string _username;
         protected readonly string _password;
         protected bool _authenticated = false;
 
-        public BaseClient(string uri, string username, string password)
+        public BaseClient(string baseUri, string username, string password)
         {
-            _uri = uri;
+            _baseUri = baseUri;
             _username = username;
             _password = password;
             _cookieContainer = new CookieContainer();
