@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using APIClient;
+using NextGen.Cli.Interfaces;
+using version_control_tool.Commands.Exceptions;
 
 namespace NextGen.Cli.Commands
 {
@@ -17,49 +15,49 @@ namespace NextGen.Cli.Commands
             "--user",
             "--token",
             "--message",
-            "--filePath"
+            "--sourcefilepath"
         };
 
         public string Name => "commit";
 
-        public string Description => "Creates and commits changes to a github repository.";
+        public string Description => "Commits changes to a github repository.";
 
         public string[] Parameters => _parameters;
 
         public string Execute()
         {
-            string token = null;
-            if (string.IsNullOrEmpty(token))//does this makes sense?
-                token = Environment.GetEnvironmentVariable("GIT_TOKEN");
-            string repo = "testprivate";
-            string user = "malipense";
-            //string token = "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";
-            string filePath = "C:\\dev\\tests";
+            //string token = null;
+            //if (string.IsNullOrEmpty(token))//does this makes sense?
+            //    token = Environment.GetEnvironmentVariable("GIT_TOKEN");
+            //string repo = "testprivate";
+            //string user = "malipense";
+            ////string token = "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";
+            //string filePath = "C:\\dev\\tests";
 
-            string fileName = "notes/" + Path.GetFileName(Directory.GetFiles(filePath).First());
+            //string fileName = "notes/" + Path.GetFileName(Directory.GetFiles(filePath).First());
             
-            var bytes = File.ReadAllBytes(Directory.GetFiles(filePath).First());
-            var content = Convert.ToBase64String(bytes);
+            //var bytes = File.ReadAllBytes(Directory.GetFiles(filePath).First());
+            //var content = Convert.ToBase64String(bytes);
 
-            if (string.IsNullOrEmpty(token))//does this makes sense?
-                Environment.GetEnvironmentVariable("GIT_TOKEN");
+            //if (string.IsNullOrEmpty(token))//does this makes sense?
+            //    Environment.GetEnvironmentVariable("GIT_TOKEN");
 
-            GithubClient githubClient = new GithubClient("https://api.github.com", token);
+            //GithubClient githubClient = new GithubClient("https://api.github.com", token);
 
-            var output = githubClient.PutAsync($"/repos/{user}/{repo}/contents/{fileName}", new CommitBody(user, repo, fileName, "test commit", content));
+            //var output = githubClient.PutAsync($"/repos/{user}/{repo}/contents/{fileName}", new CommitBody(user, repo, fileName, "test commit", content));
 
-            return output.Result;
+            //return output.Result;
 
-            //repos/malipense/test
-            //search/repositories?q=user:malipense
-            //user/repos - auth user
-            ///repos/malipense/mirth-version-controll-tool = if private repo user needs to be auth
+            ////repos/malipense/test
+            ////search/repositories?q=user:malipense
+            ////user/repos - auth user
+            /////repos/malipense/mirth-version-controll-tool = if private repo user needs to be auth
 
 
-            /*
-             --repo 
-            --user
-             */
+            //*
+            // --repo 
+            //--user
+            // */
 
             return "This command requires the parameters to be filled, type help to see information.";
         }
@@ -69,25 +67,31 @@ namespace NextGen.Cli.Commands
             string repo = null;
             string user = null;
             string token = null;
-            string filePath = null;
-            string fileName = null;
-
+            string sourceFilePath = null;
+            string commitMessage = null;
+            string remoteFileFullname = null;
+            
             parameters.TryGetValue("--repo", out repo);
             parameters.TryGetValue("--user", out user);
             parameters.TryGetValue("--token", out token);
-            parameters.TryGetValue("--filePath", out filePath);
+            parameters.TryGetValue("--message", out commitMessage);
+            parameters.TryGetValue("--sourcefilepath", out sourceFilePath);
 
             if (string.IsNullOrEmpty(token))//does this makes sense?
+            {
+                Console.WriteLine(ExceptionMessages.MissingGitToken);
                 token = Environment.GetEnvironmentVariable("GIT_TOKEN");
+            }
+            if (string.IsNullOrEmpty(token))
+                return ExceptionMessages.MissingGitToken;
+
+            var bytes = File.ReadAllBytes(sourceFilePath);
+            var content = Convert.ToBase64String(bytes);
 
             GithubClient githubClient = new GithubClient("https://api.github.com", token);
 
-            filePath = "C:/dev/tests";
-            fileName = Directory.GetFiles(filePath).First();
-
-            var content = Convert.ToBase64String(Encoding.UTF8.GetBytes(filePath));
-
-            var output = githubClient.PutAsync($"/repos/{user}/{repo}/contents/{fileName}", new CommitBody(user, repo, fileName, "test commit", content));
+            var output = githubClient.PutAsync($"/repos/{user}/{repo}/contents/{remoteFileFullname}", 
+                new CommitPayload(user, repo, remoteFileFullname, commitMessage, content));
 
             return output.Result;
         }

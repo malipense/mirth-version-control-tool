@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using version_control_tool.Commands.Exceptions;
+using NextGen.Cli.Interfaces;
 
 namespace NextGen.Cli.Commands
 {
@@ -29,7 +31,7 @@ namespace NextGen.Cli.Commands
         }
         public string Execute(Dictionary<string, string> parameters)
         {
-            return "This command does not take arguments, type help to get detailed information.";
+            return ExceptionMessages.NoParameters;
         }
     }
 }

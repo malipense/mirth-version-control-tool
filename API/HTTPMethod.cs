@@ -1,7 +1,7 @@
 ﻿
 namespace APIClient
 {
-    public enum HTTPVerb
+    public enum HTTPMethod
     {
         POST,
         GET,

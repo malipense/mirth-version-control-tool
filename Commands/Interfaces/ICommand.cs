@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NextGen.Cli.Commands
+namespace NextGen.Cli.Interfaces
 {
     public interface ICommand
     {

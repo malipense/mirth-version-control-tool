@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -11,21 +8,20 @@ namespace APIClient
 {
     public class GithubClient : BaseClient
     {
-        private readonly string _token;
-        public GithubClient(string uri, string token) :base(uri, null, null)
+        private string _token;
+        public GithubClient(string uri, string token) :base(uri, "application/json")
         {
             _token = token;
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "mirth-tool-github-client");
+            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _token);
         }
-        public override async Task<string> GetAsync(string path)
+        public async Task<string> GetAsync(string path)
         {
             Uri uri = new Uri(_baseUri + path);
 
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("User-Agent", "mirth-tool-github-client");
-                _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _token);
-
-                Console.WriteLine("Requesting data from github...");
+                Console.WriteLine("Getting list of repositories for the current user...");
                 HttpResponseMessage response = await _httpClient.GetAsync(uri);
                 
                 response.EnsureSuccessStatusCode();
@@ -41,20 +37,17 @@ namespace APIClient
             }
         }
 
-        public async Task<string> PutAsync(string path, CommitBody body)
+        public async Task<string> PutAsync(string path, CommitPayload payload)
         {
             Uri uri = new Uri(_baseUri + path);
             try
             {               
-                _httpClient.DefaultRequestHeaders.Add("User-Agent", "mirth-tool-github-client");
-                _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _token);
-
-                Console.WriteLine("Comminting changes to repository");
+                Console.WriteLine($"Comminting changes to repository: /{payload.Owner}/{payload.Repo}");
 
                 JsonSerializerOptions jsonOptions = new JsonSerializerOptions();
                 jsonOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 
-                var jsonBody = JsonSerializer.Serialize(body, jsonOptions);
+                var jsonBody = JsonSerializer.Serialize(payload, jsonOptions);
 
                 var httpContent = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
@@ -70,16 +63,6 @@ namespace APIClient
                 Console.WriteLine(e.Message);
                 return "";
             }
-        }
-
-        public override Task<string> OptionsAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task Authenticate()
-        {
-            throw new NotImplementedException();
         }
     }
 }

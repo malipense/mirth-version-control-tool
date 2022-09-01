@@ -4,9 +4,9 @@ using System.Text;
 
 namespace APIClient
 {
-    public class CommitBody
+    public class CommitPayload
     {
-        public CommitBody(string owner, string repo, string path, string message, string content)
+        public CommitPayload(string owner, string repo, string path, string message, string content)
         {
             Owner = owner;
             Repo = repo;

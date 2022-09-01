@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using NextGen.Cli.Commands;
+using NextGen.Cli.Interfaces;
 
 namespace NextGen.Cli
 {

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using NextGen.Cli.Interfaces;
 using APIClient;
+using version_control_tool.Commands.Exceptions;
 
 namespace NextGen.Cli.Commands
 {
@@ -21,18 +22,11 @@ namespace NextGen.Cli.Commands
 
         public string Execute()
         {
-            //repos/malipense/test
-            //search/repositories?q=user:malipense
-            //user/repos - auth user
-            ///repos/malipense/mirth-version-controll-tool = if private repo user needs to be auth
-
-            return "This command requires the parameters to be filled, type help to see information.";
+           return ExceptionMessages.RequiredParameters;
         }
 
         public string Execute(Dictionary<string, string> parameters)
         {
-            var localToken = "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";
-
             string user = null;
             string token = null;
 
@@ -40,9 +34,12 @@ namespace NextGen.Cli.Commands
             parameters.TryGetValue("--token", out token);
             
             if (string.IsNullOrEmpty(token))//does this makes sense?
-                Environment.GetEnvironmentVariable("GIT_TOKEN");
+                token = Environment.GetEnvironmentVariable("GIT_TOKEN");
 
-            GithubClient githubClient = new GithubClient("https://api.github.com", localToken);
+            if(string.IsNullOrEmpty(token))
+                return ExceptionMessages.MissingGitToken;
+
+            GithubClient githubClient = new GithubClient("https://api.github.com", token);
             var output = githubClient.GetAsync($"/repos/{user}");
 
             return output.Result;

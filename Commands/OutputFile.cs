@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using NextGen.Cli.Interfaces;
+using version_control_tool.Commands.Exceptions;
 
 namespace NextGen.Cli.Commands
 {
@@ -14,7 +16,7 @@ namespace NextGen.Cli.Commands
             "--data"
         };
         public string Name => "outputfile";
-        public string Description => "writes file to a specified directory";
+        public string Description => "writes file to the specified directory";
         public string[] Parameters => _parameters;
         public string Execute(Dictionary<string, string> parameters)
         {
@@ -45,7 +47,7 @@ namespace NextGen.Cli.Commands
         }
         public string Execute()
         {
-            return "This command requires the parameters to be filled, type help to see information.";
+            return ExceptionMessages.RequiredParameters;
         }
     }
 }

@@ -1,7 +1,8 @@
-﻿using NextGen.Cli.Commands;
+﻿using NextGen.Cli.Interfaces;
 using System;
 using System.Collections.Generic;
 using APIClient;
+using version_control_tool.Commands.Exceptions;
 
 namespace NextGen.Cli
 {
@@ -21,7 +22,7 @@ namespace NextGen.Cli
         public string[] Parameters => _parameters;
         public string Execute()
         {
-            return "This command requires the parameters to be filled, type help to see information.";
+            return ExceptionMessages.RequiredParameters;
         }
         public string Execute(Dictionary<string, string> parameters)
         {
@@ -38,7 +39,7 @@ namespace NextGen.Cli
             parameters.TryGetValue("--path", out path);
             parameters.TryGetValue("--resource", out resource);
 
-            MirthHttpClient mirthHttpClient = new MirthHttpClient(server, username, password);
+            MirthHttpsClient mirthHttpClient = new MirthHttpsClient(server, username, password);
             string channels = null;
             string channelGroups = null;
             

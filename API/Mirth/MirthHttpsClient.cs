@@ -8,13 +8,19 @@ using System.Xml.Linq;
 
 namespace APIClient
 {
-    public class MirthHttpClient : BaseClient
+    public class MirthHttpsClient : BaseClient
     {
-        public MirthHttpClient(string uri, string username, string password) :base(uri, username, password)
-        {   }
+        private string _username;
+        private string _password;
+        private bool _authenticated = false;
+        public MirthHttpsClient(string uri, string username, string password) :base(uri, "application/xml")
+        {
+            _username = username;
+            _password = password;
+        }
 
         
-        public override async Task Authenticate()
+        public async Task Authenticate()
         {
             Console.WriteLine("Authenticating user...\n");
             Uri uri = new Uri(_baseUri + Endpoints.Login);
@@ -45,7 +51,7 @@ namespace APIClient
             }
         }
 
-        public override async Task<string> GetAsync(string endpoint)
+        public async Task<string> GetAsync(string endpoint)
         {
             if(!_authenticated)
                 await Authenticate();
@@ -55,9 +61,6 @@ namespace APIClient
                 HttpResponseMessage response = await _httpClient.GetAsync(_baseUri + endpoint);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
-
-                //var j = JObject.Parse(responseBody);
-                //var resultsAmount = j["list"].Count() > 0 ? "found" : "none";
 
                 var j = XDocument.Parse(responseBody);
                 var resultsAmount = j.Root.Elements().ToArray().Count() > 0 ? "found" : "none";
@@ -71,26 +74,6 @@ namespace APIClient
                 return responseBody;
             }
             catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nSomething went wrong!");
-                Console.WriteLine(e.Message);
-                return "";
-            }
-        }
-
-        public override async Task<string> OptionsAsync()
-        {
-            try
-            {
-                HttpRequestMessage request = new HttpRequestMessage();
-                request.Method = HttpMethod.Options;
-                HttpResponseMessage response = await _httpClient.SendAsync(request);
-
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                return responseBody;
-            }
-            catch(HttpRequestException e)
             {
                 Console.WriteLine("\nSomething went wrong!");
                 Console.WriteLine(e.Message);

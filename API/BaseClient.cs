@@ -9,15 +9,12 @@ namespace APIClient
         protected readonly HttpClient _httpClient;
         protected readonly CookieContainer _cookieContainer;
         protected readonly string _baseUri;
-        protected readonly string _username;
-        protected readonly string _password;
-        protected bool _authenticated = false;
+        protected readonly string _mediaType;
 
-        public BaseClient(string baseUri, string username, string password)
+        public BaseClient(string baseUri, string mediaType)
         {
             _baseUri = baseUri;
-            _username = username;
-            _password = password;
+            _mediaType = mediaType;
             _cookieContainer = new CookieContainer();
             _httpClient = GenerateClient();
         }
@@ -29,14 +26,10 @@ namespace APIClient
 
             HttpClient httpClient = new HttpClient(clientHandler);
             httpClient.DefaultRequestHeaders.Accept.Add(
-                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json")
+                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(_mediaType)
                 );
 
             return httpClient;
         }
-
-        public abstract Task Authenticate();
-        public abstract Task<string> GetAsync(string endpoint);
-        public abstract Task<string> OptionsAsync();
     }
 }
