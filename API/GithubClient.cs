@@ -44,14 +44,45 @@ namespace APIClient
 
         public override async Task<string> GetAsync(string endpoint)
         {
-            if (!_authenticated)
-                await Authenticate();
+            var token = "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";
+            Uri uri = new Uri(_uri + endpoint);
+
             try
             {
+                _httpClient.DefaultRequestHeaders.Add("User-Agent", "mirth-tool-github-client");
+                //_httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+
+                Console.WriteLine("Retriving data - status:");
+                HttpResponseMessage response = await _httpClient.GetAsync(_uri + endpoint);
+                
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                return responseBody;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nSomething went wrong!");
+                Console.WriteLine(e.Message);
+                return "";
+            }
+        }
+
+        public async Task<string> PostAsync(string endpoint)
+        {
+            var token = "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";
+
+            try
+            {
+               
+                _httpClient.DefaultRequestHeaders.Add("User-Agent", "mirth-tool-github-client");
+                _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+
                 Console.WriteLine("Retriving data - status:");
                 HttpResponseMessage response = await _httpClient.GetAsync(_uri + endpoint);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
+                
 
                 return responseBody;
             }

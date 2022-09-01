@@ -18,8 +18,11 @@ namespace NextGen.Cli.Commands
         public string Execute()
         {
             GithubClient githubClient = new GithubClient("https://api.github.com", "eduardo.malipense@gmail.com", "gih@38x1*/WDS451xc");
-            var output = githubClient.GetAsync("/repositories");
-            
+            var output = githubClient.GetAsync("/search/repositories?q=user:malipense");
+            //repos/malipense/test
+            //search/repositories?q=user:malipense
+            //user/repos - auth user
+            ///repos/malipense/mirth-version-controll-tool = if private repo user needs to be auth
             return output.Result;
         }
 

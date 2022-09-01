@@ -29,7 +29,7 @@ namespace APIClient
 
             HttpClient httpClient = new HttpClient(clientHandler);
             httpClient.DefaultRequestHeaders.Accept.Add(
-                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/xml")
+                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json")
                 );
 
             return httpClient;
