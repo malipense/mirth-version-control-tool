@@ -9,7 +9,7 @@ namespace NextGen.Cli.Commands
     public class Help : ICommand
     {
         public string Name => "help";
-        public string Description => "List all the available commands in the current version.\n";
+        public string Description => "list all the available commands in the current version.\n";
         public string[] Parameters => Array.Empty<string>();
         public string Execute()
         {

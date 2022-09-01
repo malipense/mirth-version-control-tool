@@ -20,7 +20,7 @@ namespace NextGen.Cli.Commands
 
         public string Name => "commit";
 
-        public string Description => "Commits changes to a github repository.";
+        public string Description => "commits changes to a github repository.";
 
         public string[] Parameters => _parameters;
 
