@@ -6,6 +6,7 @@ Mirth Connect Web API.
 Current commands availables:
 
 MIRTHPULL - pulls data from remote NextGen/Mirth server. Saves it to the provided path as xml.
+	
 	PARAMETERS: [
 		--server = remote server address or IP
 		--username = valid mirth user
@@ -17,6 +18,7 @@ MIRTHPULL - pulls data from remote NextGen/Mirth server. Saves it to the provide
 	EX: mirthpull --server https://mirthserver:8443/api --username user --password password --resource channels --saveto C:/backup/channels
 
 COMMIT - commits changes to a github repository.
+	
 	PARAMETERS: [
 		--repo = github destination repo, for private repositories the user needs to be authenticated
 		--username = github username
