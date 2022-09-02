@@ -8,14 +8,12 @@ namespace NextGen.Cli
 {
     public class MirthPull : ICommand
     {
-        private string[] _parameters = new string[6]
+        private string[] _parameters = new string[4]
         {
             "--server",
             "--username",
             "--password",
-            "--path",
-            "--dataType",
-            "--resource"
+            "--path"
         };
         public string Name => "mirthpull";
         public string Description => "pulls data from remote NextGen/Mirth server. Saves it to the provided path as xml.";
@@ -31,15 +29,13 @@ namespace NextGen.Cli
             string username = null;
             string password = null;
             string path = null;
-            string resource = null;
             
             parameters.TryGetValue("--server", out server);
             parameters.TryGetValue("--username", out username);
             parameters.TryGetValue("--password", out password);
             parameters.TryGetValue("--path", out path);
-            parameters.TryGetValue("--resource", out resource);
-
-            MirthHttpsClient mirthHttpClient = new MirthHttpsClient(server, username, password);
+            
+            MirthHttpsClient mirthHttpClient = new MirthHttpsClient("https://" + server + "/api", username, password);
             string channels = null;
             string channelGroups = null;
             
@@ -53,7 +49,7 @@ namespace NextGen.Cli
                 folderManager.WriteChannels(channels, path);
 
                 folderManager.OrganizeChannels(path);
-                output = $"Files written to {path}.";
+                output = $"Files written to {path}.\n";
             }
             catch (Exception ex)
             {

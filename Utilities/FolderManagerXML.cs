@@ -15,12 +15,6 @@ namespace NextGen.Cli
             _channelGroupsWrapper = new List<GroupWrapper>();
         }
 
-        public void CreateFolders()
-        {
-            Directory.CreateDirectory($"../../../remote/Libraries");
-            Directory.CreateDirectory($"../../../remote/Channels");
-        }
-
         public void WriteTemplates(string xmlContent)
         {
             XmlDocument codeTemplateDocument = new XmlDocument();
@@ -46,6 +40,9 @@ namespace NextGen.Cli
             var xDocGroups = XDocument.Parse(xmlContent);
             var xElementsGroups = xDocGroups.Root.Elements().ToArray();
 
+            if(!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            
             Console.WriteLine($"Saving data on {path}/Channels...");
 
             for (int i = 0; i < xElementsGroups.Length; i++)
@@ -53,13 +50,12 @@ namespace NextGen.Cli
                 groupsDocument.LoadXml(xElementsGroups[i].ToString());
                 var folderName = groupsDocument.GetElementsByTagName("name")[0].InnerText;
 
-                Directory.CreateDirectory($"{path}/Channels/{folderName}");
+                Directory.CreateDirectory($"{path}/{folderName}");
                 
                 foreach (XmlNode node in groupsDocument.GetElementsByTagName("id"))
                 {
                     _channelGroupsWrapper.Add(new GroupWrapper(folderName, node.InnerText));
-                }
-                
+                }       
             }
         }
 
@@ -70,39 +66,40 @@ namespace NextGen.Cli
             var xDocChannels = XDocument.Parse(xmlContent);
             var xElementsChannels = xDocChannels.Root.Elements().ToArray();
 
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            
             for (int i = 0; i < xElementsChannels.Length; i++)
             {
                 channelsDocument.LoadXml(xElementsChannels[i].ToString());
                 var name = channelsDocument.GetElementsByTagName("name")[0].InnerText;
-                channelsDocument.Save($"{path}/Channels/{name}.xml");
+                channelsDocument.Save($"{path}/{name}.xml");
             }
         }
 
         public void OrganizeChannels(string path)
         {
-            Console.WriteLine($"Organizing channels...");
-            XmlDocument document = new XmlDocument();
-            var files = Directory.EnumerateFiles($"{path}/Channels", "*.xml").ToArray();
-
-            for (var i = 0; i < files.Length; i++)
+            if (_channelGroupsWrapper.Count > 0)
             {
-                var fileName = Path.GetFileName(files[i]);
-                document.Load(files[i]);
-                var channelId = document.GetElementsByTagName("id")[0].InnerText;
-                foreach (var wrapper in _channelGroupsWrapper)
+                Console.WriteLine($"Organizing channels...");
+                XmlDocument document = new XmlDocument();
+                var files = Directory.EnumerateFiles($"{path}", "*.xml").ToArray();
+
+                for (var i = 0; i < files.Length; i++)
                 {
-                    if (wrapper.id == channelId)
+                    var fileName = Path.GetFileName(files[i]);
+                    document.Load(files[i]);
+                    var channelId = document.GetElementsByTagName("id")[0].InnerText;
+                    foreach (var wrapper in _channelGroupsWrapper)
                     {
-                        if (!File.Exists($"{path}/Channels/{wrapper.groupName}/{fileName}"))
-                            File.Move(files[i], $"{path}/Channels/{wrapper.groupName}/{fileName}");
+                        if (wrapper.id == channelId)
+                        {
+                            if (!File.Exists($"{path}/{wrapper.groupName}/{fileName}"))
+                                File.Move(files[i], $"{path}/{wrapper.groupName}/{fileName}");
+                        }
                     }
                 }
             }
-        }
-
-        public void OrganizeChannels()
-        {
-            throw new NotImplementedException();
         }
     }
 }

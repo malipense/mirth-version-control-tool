@@ -53,6 +53,8 @@ namespace APIClient
 
                 HttpResponseMessage response = await _httpClient.PutAsync(uri, httpContent);
                 response.EnsureSuccessStatusCode();
+
+                Console.WriteLine(response.StatusCode);
                 string responseBody = await response.Content.ReadAsStringAsync();
                 
                 return responseBody;

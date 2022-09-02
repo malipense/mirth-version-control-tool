@@ -79,7 +79,7 @@ namespace NextGen.Cli.Commands
 
             if (string.IsNullOrEmpty(token))//does this makes sense?
             {
-                Console.WriteLine(ExceptionMessages.MissingGitToken);
+                Console.WriteLine(ExceptionMessages.GitTokenWarning);
                 token = Environment.GetEnvironmentVariable("GIT_TOKEN");
             }
             if (string.IsNullOrEmpty(token))
@@ -87,6 +87,7 @@ namespace NextGen.Cli.Commands
 
             var bytes = File.ReadAllBytes(sourceFilePath);
             var content = Convert.ToBase64String(bytes);
+            remoteFileFullname = Path.GetFileName(sourceFilePath);
 
             GithubClient githubClient = new GithubClient("https://api.github.com", token);
 

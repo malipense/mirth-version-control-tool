@@ -84,6 +84,7 @@ namespace NextGen.Cli
 
             return succedeed;
         }
+
         private static string TryExecuteCommand(string inputCommand, string previousCommandResult = null)
         {
             ICommand command = null;
@@ -109,6 +110,33 @@ namespace NextGen.Cli
                     values.Add(previousCommandResult);
                 }
 
+                //verify if there is values entered between ""
+                int startIndex = 0;
+                int endIndex = 0;
+                for (int i = 1; i < commandParametersAndValueList.Length; i++)
+                {
+                    if (commandParametersAndValueList[i].StartsWith('\"'))
+                        startIndex = i;
+                    if (commandParametersAndValueList[i].EndsWith('\"'))
+                        endIndex = i;
+                }
+
+                if (startIndex != 0)
+                {
+                    string bindedString = null;
+                    for (int i = startIndex; i <= endIndex; i++)
+                        bindedString = bindedString + commandParametersAndValueList[i] + " ";
+
+                    var list = commandParametersAndValueList.ToList();
+                    for (int i = startIndex + 1; i <= endIndex; i++)
+                    {
+                        list[startIndex] = bindedString.Trim();
+                        list.RemoveAt(startIndex + 1);
+                    }
+
+                    commandParametersAndValueList = list.ToArray(); //override value with new 
+                }
+
                 for (int i = 1; i < commandParametersAndValueList.Length; i++)
                 {
                     if (commandParametersAndValueList[i].StartsWith("--"))
@@ -116,6 +144,7 @@ namespace NextGen.Cli
                     else
                         values.Add(commandParametersAndValueList[i]);
                 }
+
                 if (values.Count() == 0 && args.Count() > 0)
                     return "No value provided for the parameter.";
 

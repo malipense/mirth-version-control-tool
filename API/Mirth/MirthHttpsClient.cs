@@ -13,7 +13,7 @@ namespace APIClient
         private string _username;
         private string _password;
         private bool _authenticated = false;
-        public MirthHttpsClient(string uri, string username, string password) :base(uri, "application/xml")
+        public MirthHttpsClient(string baseUri, string username, string password) :base(baseUri, "application/xml")
         {
             _username = username;
             _password = password;
@@ -63,7 +63,7 @@ namespace APIClient
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 var j = XDocument.Parse(responseBody);
-                var resultsAmount = j.Root.Elements().ToArray().Count() > 0 ? "found" : "none";
+                var resultsAmount = j.Root.Elements().ToArray().Count();
 
                 Console.WriteLine(
                     $"-------------------------------------------------------------\n" +

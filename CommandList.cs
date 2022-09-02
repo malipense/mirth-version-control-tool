@@ -1,4 +1,5 @@
 ﻿using NextGen.Cli.Commands;
+using NextGen.Cli.Interfaces;
 
 namespace NextGen.Cli
 {
