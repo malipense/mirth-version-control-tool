@@ -8,23 +8,23 @@ namespace NextGen.Cli.Commands
 {
     public class Help : ICommand
     {
-        public string Name => "help";
-        public string Description => "list all the available commands in the current version.\n";
+        public string Name => "HELP";
+        public string Description => "list all the available commands in the current version.";
         public string[] Parameters => Array.Empty<string>();
         public string Execute()
         {
-            StringBuilder manual = new StringBuilder("List of available commands at the current version (1.0)\n\n");
+            StringBuilder manual = new StringBuilder("List of available commands at the current version (1.0).\n");
        
             foreach(var cmd in CommandList.commands)
             {
-                manual.Append("\n" + cmd.Name + " - " + cmd.Description);
+                manual.Append("\n"+cmd.Name + " - " + cmd.Description);
 
                 if (cmd.Parameters.Length > 0)
                 {
-                    manual.Append("\nparameters [ \n");
+                    manual.Append("\n     parameters [ \n");
                     foreach (var param in cmd.Parameters)
-                        manual.Append("     " + param.ToString() + "\n");
-                    manual.Append("]\n");
+                        manual.Append("         " + param.ToString() + "\n");
+                    manual.Append("     ]\n");
                 }
             }
             return manual.ToString();

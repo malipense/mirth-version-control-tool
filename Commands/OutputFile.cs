@@ -15,8 +15,8 @@ namespace NextGen.Cli.Commands
             "--name",
             "--data"
         };
-        public string Name => "outputfile";
-        public string Description => "writes file to the specified directory";
+        public string Name => "OUTPUTFILE";
+        public string Description => "writes file to the specified directory.";
         public string[] Parameters => _parameters;
         public string Execute(Dictionary<string, string> parameters)
         {

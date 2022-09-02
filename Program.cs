@@ -23,7 +23,6 @@ namespace NextGen.Cli
                     //one block on execution
                     var executionResult = TryExecuteCommand(inputCommandBlocks[0]);
 
-                    Console.WriteLine("\n");
                     Console.WriteLine(executionResult);
                 }
                 else
@@ -98,7 +97,7 @@ namespace NextGen.Cli
             string commandName = commandParametersAndValueList[0];
 
 
-            command = CommandList.commands.FirstOrDefault(c => c.Name == commandParametersAndValueList[0].ToLower());
+            command = CommandList.commands.FirstOrDefault(c => c.Name.ToLower() == commandParametersAndValueList[0].ToLower());
             if(command == null)
                 return "Command not found";
             

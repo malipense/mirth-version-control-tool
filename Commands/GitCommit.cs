@@ -7,7 +7,7 @@ using version_control_tool.Commands.Exceptions;
 
 namespace NextGen.Cli.Commands
 {
-    public class Commit : ICommand
+    public class GitCommit : ICommand
     {
         private string[] _parameters = new string[5]
         {
@@ -18,7 +18,7 @@ namespace NextGen.Cli.Commands
             "--sourcefilepath"
         };
 
-        public string Name => "commit";
+        public string Name => "GITCOMMIT";
 
         public string Description => "commits changes to a github repository.";
 

@@ -8,10 +8,9 @@ namespace NextGen.Cli
         public static ICommand[] commands =
         {
             new Help(),
-            new OutputFile(),
             new MirthPull(),
             new Exit(),
-            new Commit()
+            new GitCommit()
         };
     }
 }

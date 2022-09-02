@@ -15,7 +15,7 @@ namespace NextGen.Cli
             "--password",
             "--path"
         };
-        public string Name => "mirthpull";
+        public string Name => "MIRTHPULL";
         public string Description => "pulls data from remote NextGen/Mirth server. Saves it to the provided path as xml.";
         public string[] Parameters => _parameters;
         public string Execute()

@@ -14,9 +14,9 @@ namespace NextGen.Cli.Commands
             "--token"
         };
 
-        public string Name => "commit";
+        public string Name => "LISTREPO";
 
-        public string Description => "Creates and commits changes to a github repository.";
+        public string Description => "retrieves a list user's repositories. Requires authentication for private repos.";
 
         public string[] Parameters => _parameters;
 
@@ -32,15 +32,18 @@ namespace NextGen.Cli.Commands
 
             parameters.TryGetValue("--user", out user);
             parameters.TryGetValue("--token", out token);
-            
-            if (string.IsNullOrEmpty(token))//does this makes sense?
-                token = Environment.GetEnvironmentVariable("GIT_TOKEN");
 
-            if(string.IsNullOrEmpty(token))
+            if (string.IsNullOrEmpty(token))//does this makes sense?
+            {
+                Console.WriteLine(ExceptionMessages.GitTokenWarning);
+                token = Environment.GetEnvironmentVariable("GIT_TOKEN");
+            }
+
+            if (string.IsNullOrEmpty(token))
                 return ExceptionMessages.MissingGitToken;
 
             GithubClient githubClient = new GithubClient("https://api.github.com", token);
-            var output = githubClient.GetAsync($"/repos/{user}");
+            var output = githubClient.GetAsync($"/user/repos");
 
             return output.Result;
         }

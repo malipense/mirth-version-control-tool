@@ -7,8 +7,8 @@ namespace NextGen.Cli.Commands
 {
     public class Exit : ICommand
     {
-        public string Name => "exit";
-        public string Description => "Exit the application.";
+        public string Name => "EXIT";
+        public string Description => "exit the application.";
         public string[] Parameters => Array.Empty<string>();
 
         public string Execute()
