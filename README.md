@@ -1,4 +1,4 @@
-# mirth-version-controll-tool
+# mirth-version-control-tool
 
 Console application developed to pull all channels and libraries from a Mirth Connect instance using
 Mirth Connect Web API.
@@ -28,8 +28,6 @@ COMMIT - commits changes to a github repository.
 	]
 
 	EX: commit --repo githubrepo --user malipense --message "this is a commit message" --sourcefilepath C:/dev/test/file.xml	--token xWEs1
-
-OUTPUTFILE - writes file to path
 
 HELP - list all the available commands in the current version.
 
