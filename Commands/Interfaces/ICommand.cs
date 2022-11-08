@@ -7,8 +7,8 @@ namespace NextGen.Cli.Interfaces
     {
         public string Name { get; }
         public string Description { get; }
-        public string[] Parameters { get; }
+        public List<Option> Options { get; }
         public string Execute();
-        public string Execute(Dictionary<string, string> parameters);
+        public string Execute(IDictionary<string, string> parameters);
     }
 }

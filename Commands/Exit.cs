@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using version_control_tool.Commands.Exceptions;
+using NextGen.Cli.Commands.Exceptions;
 using NextGen.Cli.Interfaces;
 
 namespace NextGen.Cli.Commands
@@ -9,7 +9,7 @@ namespace NextGen.Cli.Commands
     {
         public string Name => "EXIT";
         public string Description => "exit the application.";
-        public string[] Parameters => Array.Empty<string>();
+        public List<Option> Options => null;
 
         public string Execute()
         {
@@ -17,9 +17,9 @@ namespace NextGen.Cli.Commands
             return "Bye";
         }
 
-        public string Execute(Dictionary<string, string> parameters)
+        public string Execute(IDictionary<string, string> parameters)
         {
-            return ExceptionMessages.NoParameters;
+            return ExceptionMessages.TakesNoParameters;
         }
     }
 }

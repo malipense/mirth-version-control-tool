@@ -3,79 +3,40 @@ using System.Collections.Generic;
 using System.IO;
 using APIClient;
 using NextGen.Cli.Interfaces;
-using version_control_tool.Commands.Exceptions;
+using NextGen.Cli.Commands.Exceptions;
 
 namespace NextGen.Cli.Commands
 {
     public class GitCommit : ICommand
     {
-        private string[] _parameters = new string[5]
+        private List<Option> _options = new List<Option>()
         {
-            "--repo",
-            "--user",
-            "--token",
-            "--message",
-            "--sourcefilepath"
+            new Option("--user", "github user id"),
+            new Option("--token", "github access token"),
+            new Option("--message", "github commit message"),
+            new Option("--sourcefilepath", "file fullname including the path")
         };
 
         public string Name => "GITCOMMIT";
 
         public string Description => "commits changes to a github repository.";
 
-        public string[] Parameters => _parameters;
+        public List<Option> Options => _options;
 
         public string Execute()
         {
-            //string token = null;
-            //if (string.IsNullOrEmpty(token))//does this makes sense?
-            //    token = Environment.GetEnvironmentVariable("GIT_TOKEN");
-            //string repo = "testprivate";
-            //string user = "malipense";
-            ////string token = "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";
-            //string filePath = "C:\\dev\\tests";
-
-            //string fileName = "notes/" + Path.GetFileName(Directory.GetFiles(filePath).First());
-            
-            //var bytes = File.ReadAllBytes(Directory.GetFiles(filePath).First());
-            //var content = Convert.ToBase64String(bytes);
-
-            //if (string.IsNullOrEmpty(token))//does this makes sense?
-            //    Environment.GetEnvironmentVariable("GIT_TOKEN");
-
-            //GithubClient githubClient = new GithubClient("https://api.github.com", token);
-
-            //var output = githubClient.PutAsync($"/repos/{user}/{repo}/contents/{fileName}", new CommitBody(user, repo, fileName, "test commit", content));
-
-            //return output.Result;
-
-            ////repos/malipense/test
-            ////search/repositories?q=user:malipense
-            ////user/repos - auth user
-            /////repos/malipense/mirth-version-controll-tool = if private repo user needs to be auth
-
-
-            //*
-            // --repo 
-            //--user
-            // */
-
-            return "This command requires the parameters to be filled, type help to see information.";
+            return ExceptionMessages.RequiredParameters;
         }
 
-        public string Execute(Dictionary<string, string> parameters)
+        public string Execute(IDictionary<string, string> parameters)
         {
-            string repo = null;
-            string user = null;
-            string token = null;
-            string sourceFilePath = null;
-            string commitMessage = null;
-            string remoteFileFullname = null;
+            string remoteFileFullname;
             
-            parameters.TryGetValue("--repo", out repo);
-            parameters.TryGetValue("--user", out user);
-            parameters.TryGetValue("--token", out token);
-            parameters.TryGetValue("--message", out commitMessage);
-            parameters.TryGetValue("--sourcefilepath", out sourceFilePath);
+            parameters.TryGetValue("--repo", out string repo);
+            parameters.TryGetValue("--user", out string user);
+            parameters.TryGetValue("--token", out string token);
+            parameters.TryGetValue("--message", out string commitMessage);
+            parameters.TryGetValue("--sourcefilepath", out string sourceFilePath);
 
             if (string.IsNullOrEmpty(token))//does this makes sense?
             {

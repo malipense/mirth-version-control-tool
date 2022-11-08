@@ -2,32 +2,28 @@
 using System.Collections.Generic;
 using System.IO;
 using NextGen.Cli.Interfaces;
-using version_control_tool.Commands.Exceptions;
+using NextGen.Cli.Commands.Exceptions;
 
 namespace NextGen.Cli.Commands
 {
     public class OutputFile : ICommand
     {
-        private string[] _parameters = new string[4]
+        private List<Option> _options = new List<Option>
         {
-            "--path",
-            "--extension",
-            "--name",
-            "--data"
+            new Option("--path", "path where to save the file"),
+            new Option("--extension", "file extension"),
+            new Option("--name", "filename")
         };
         public string Name => "OUTPUTFILE";
         public string Description => "writes file to the specified directory.";
-        public string[] Parameters => _parameters;
-        public string Execute(Dictionary<string, string> parameters)
+        public List<Option> Options => _options;
+        public string Execute(IDictionary<string, string> parameters)
         {
-            string output = null;
-            string path = null;
-            string data = null;
-            string name = null;
+            string output;
 
-            parameters.TryGetValue("-path", out path);
-            parameters.TryGetValue("-data", out data);
-            parameters.TryGetValue("-name", out name);
+            parameters.TryGetValue("-path", out string path);
+            parameters.TryGetValue("-data", out string data);
+            parameters.TryGetValue("-name", out string name);
             
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);

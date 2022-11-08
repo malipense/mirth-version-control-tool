@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using version_control_tool.Commands.Exceptions;
+using NextGen.Cli.Commands.Exceptions;
 using NextGen.Cli.Interfaces;
 
 namespace NextGen.Cli.Commands
@@ -10,28 +10,28 @@ namespace NextGen.Cli.Commands
     {
         public string Name => "HELP";
         public string Description => "list all the available commands in the current version.";
-        public string[] Parameters => Array.Empty<string>();
+        public List<Option> Options => null;
         public string Execute()
         {
-            StringBuilder manual = new StringBuilder("List of available commands at the current version (1.0).\n");
+            StringBuilder manual = new StringBuilder("List of available commands at the current version (1.0.1).\n");
        
             foreach(var cmd in CommandList.commands)
             {
                 manual.Append("\n"+cmd.Name + " - " + cmd.Description);
 
-                if (cmd.Parameters.Length > 0)
+                if ((cmd.Options != null) && cmd.Options.Count > 0)
                 {
-                    manual.Append("\n     parameters [ \n");
-                    foreach (var param in cmd.Parameters)
-                        manual.Append("         " + param.ToString() + "\n");
+                    manual.Append("\n     options [ \n");
+                    foreach (var opt in cmd.Options)
+                        manual.Append($"         {opt.Name} - {opt.Description}\n");
                     manual.Append("     ]\n");
                 }
             }
             return manual.ToString();
         }
-        public string Execute(Dictionary<string, string> parameters)
+        public string Execute(IDictionary<string, string> parameters)
         {
-            return ExceptionMessages.NoParameters;
+            return ExceptionMessages.TakesNoParameters;
         }
     }
 }
