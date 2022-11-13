@@ -8,10 +8,10 @@ namespace NextGen.Cli
         public static ICommand[] commands =
         {
             new Help(),
-            new MirthPull(),
+            new PullChannels(),
+            new PullLibrary(),
             new Exit(),
-            new GitCommit(),
-            new GitList()
+            new Clear()
         };
     }
 }

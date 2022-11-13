@@ -69,7 +69,7 @@ namespace NextGen.Cli
             var name = input.Trim().Split(' ').First();
             var parameters = input.Trim().Split(' ').Skip(1);
             
-            var command = CommandList.commands.FirstOrDefault(c => c.Name.ToLower() == name);
+            var command = CommandList.commands.FirstOrDefault(c => c.Name.ToLower() == name.ToLower());
             if(command == null)
                 return ExceptionMessages.CommandNotFound;
 
@@ -95,10 +95,11 @@ namespace NextGen.Cli
             message += "Nextgen CLI v" + version + "\n";
             message += "This is a very basic tool created to export resources out of nextgen connect (mirth connect)\n";
             message += "through its REST API.\n";
-            message += "The goal is just to make it easier to backup your channels and libraries, currently you also\n";
-            message += "have a command to push your downloaded files to a private (requires authentication) or public\n";
-            message += "github repository.\n";
-            message += "There is always room to improve, so feel free to modify it and reuse it as it suits you.\n";
+            message += "The goal is just to make it easier to backup your channels and libraries.\n";
+            message += "Currently only GET operations are implemented. You can't use this tool to create/update resources yet.\n";
+            message += "I was working on creating commands to commit files to a git repository\n";
+            message += "but I decided to leave it aside for the moment.\n";
+            message += "\nFeel free to modify it and reuse it as it suits you.\n";
             message += "Source code avaliable on github malipense/nextgencli.                                 - Cuco\n";
             Console.WriteLine(message);
         }

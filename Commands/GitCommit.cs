@@ -38,7 +38,7 @@ namespace NextGen.Cli.Commands
             parameters.TryGetValue("--message", out string commitMessage);
             parameters.TryGetValue("--sourcefilepath", out string sourceFilePath);
 
-            if (string.IsNullOrEmpty(token))//does this makes sense?
+            if (string.IsNullOrEmpty(token))
             {
                 Console.WriteLine(ExceptionMessages.GitTokenWarning);
                 token = Environment.GetEnvironmentVariable("GIT_TOKEN");
