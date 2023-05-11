@@ -5,37 +5,29 @@ Mirth Connect Web API.
 
 Current commands availables:
 
-MIRTHPULL - pulls data from remote NextGen/Mirth server. Saves it to the provided path as xml.
+PULLCHANNELS - pulls data from remote NextGen/Mirth server. Saves it to the provided path as xml.
 	
 	PARAMETERS: [
 		--server = remote server name or IP
 		--username = valid mirth user
 		--password = user's password
-		--resource = which resource you want to retrieve - currently supports: channels
-		--saveto = path to save the files
+		--path = C:/backup/channels
 	]	
 
-	EX: mirthpull --server https://mirthserver:8443/api --username user --password password --resource channels --saveto C:/backup/channels
+	EX: pullchannels --server https://mirthserver:8443/api --username user --password password --path C:/backup/channels
 
-COMMIT - commits changes to a github repository.
-	
+PULLLIB - pulls libraries and code templates.
+
 	PARAMETERS: [
-		--repo = github destination repo, for private repositories the user needs to be authenticated (--token)
-		--username = github username
-		--sourcefilepath = file fullname/path
-		--token = required for private repositories
-		--message = commit message - needs to be between "" if contains white spaces
-	]
+		--server = remote server name or IP
+		--username = valid mirth user
+		--password = user's password
+		--path = C:/backup/codetemplates
+	]	
 
-	EX: commit --repo githubrepo --user malipense --message "this is a commit message" --sourcefilepath C:/dev/test/file.xml	--token xWEs1
+	EX: pulllib --server https://mirthserver:8443/api --username user --password password --path C:/backup/channels
 
-HELP - list all the available commands in the current version.
-
-*****************************************************************************************
-**TODO: add option to upload/send xml files to CREATE a new channel on the server	   **
-**TODO: add option to upload/send xml files to UPDATE an existing channel on the server**
-*****************************************************************************************
-
-*HOW TO USE*
+HELP - list available commands.
+EXIT - exit application.
 
 Author: Eduardo Malipense
