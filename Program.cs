@@ -8,7 +8,6 @@ namespace NextGen.Cli
 {
     class Program
     {
-        public static readonly string version = "1.0.1";
         static void Main(string[] args)
         {
             HelloUser();
@@ -92,7 +91,7 @@ namespace NextGen.Cli
             message += "*****************************************WELCOME********************************************\n";
             message += "********************************************************************************************\n";
             message += "********************************************************************************************\n\n";
-            message += "Nextgen CLI v" + version + "\n";
+            message += "Nextgen CLI\n";
             message += "This is a very basic tool created to export resources out of nextgen connect (mirth connect)\n";
             message += "through its REST API.\n";
             message += "The goal is just to make it easier to backup your channels and libraries.\n";

@@ -1,4 +1,4 @@
-﻿namespace APIClient
+﻿namespace NextGen.Cli
 {
     public static class Endpoints
     {

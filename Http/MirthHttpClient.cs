@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace APIClient
+namespace NextGen.Cli
 {
     public class MirthHttpClient : BaseClient
     {

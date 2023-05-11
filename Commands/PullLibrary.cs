@@ -1,7 +1,6 @@
 ﻿using NextGen.Cli.Interfaces;
 using System;
 using System.Collections.Generic;
-using APIClient;
 using NextGen.Cli.Commands.Exceptions;
 
 namespace NextGen.Cli
